@@ -58,6 +58,8 @@ class TestOUICacheAPI(TestCase):
         oui_text_patch = patch(f'{OUI_CORE_PATH}.get_oui_text', return_value=cls.mock_response)
         cls.patchers.append(oui_text_patch)
 
+        cls.patchers.append(patch('builtins.print', return_value=None))
+
         for oui_path in [OUI_CLASSES_PATH, OUI_CORE_PATH]:
             cls.patchers.append(patch(f'{oui_path}.VERSION', 'TEST'))
             cls.patchers.append(patch(f'{oui_path}.PICKLE_DIR', cls.write_test_path))

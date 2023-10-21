@@ -73,7 +73,6 @@ def get_oui_item(input_item: Union[str, list[str]],
         return result
     raise ValueError('Input must be either a string or list of strings')
 
-
 def get_oui_vendor(input_item: Union[str, list[str]],
                    rebuild: bool = False) -> Optional[str]:
     """
