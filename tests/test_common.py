@@ -4,7 +4,6 @@
 from dataclasses import dataclass
 from random import randint
 from typing import Literal
-from unittest.mock import patch
 
 # Local Modules
 from mactools.macaddress import (
@@ -15,10 +14,6 @@ from mactools.macaddress import (
 from mactools.oui_cache.oui_classes import (
     OUICache,
     OUIRecord
-)
-
-from mactools.oui_cache.oui_core import (
-    get_oui_cache,
 )
 
 TEST_IEEE_DATA = {

@@ -1,6 +1,5 @@
 # OUI tests
 
-from pickle import load, dump
 from unittest import TestCase, main
 from unittest.mock import Mock, patch
 from os import path, remove

@@ -5,7 +5,6 @@ from mactools.oui_cache.oui_api_calls import (
 
 from unittest import TestCase, main
 from unittest.mock import Mock, patch
-from icecream import ic
 
 API_DIR = 'mactools.oui_cache.oui_api_calls'
 

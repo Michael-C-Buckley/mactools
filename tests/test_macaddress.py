@@ -4,7 +4,6 @@
 from re import match, Pattern
 from unittest import TestCase, main
 from typing import Optional
-from unittest.mock import patch
 
 # Local Modules
 from tests.test_common import (
@@ -17,8 +16,6 @@ from tests.test_common import (
     TEST_CACHE
 )
 
-from mactools.oui_cache.oui_core import get_oui_cache
-
 from mactools.macaddress import (
     MacAddress,
     Notation,
@@ -27,7 +24,6 @@ from mactools.macaddress import (
     EUI48_MAC_REGEX,
     EUI64_MAC_REGEX,
 )
-
 
 
 class TestFunctions(TestCase):

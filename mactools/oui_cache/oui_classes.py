@@ -11,9 +11,10 @@ from pickle import dump
 from mactools.oui_cache.oui_common import (
     CACHE_DIR,
     PICKLE_DIR,
-    MacAddress,
     VERSION
 )
+
+from mactools.macaddress import MacAddress
 
 @dataclass
 class OUIRecord:

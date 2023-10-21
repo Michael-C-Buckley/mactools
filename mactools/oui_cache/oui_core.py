@@ -1,15 +1,12 @@
 # OUI Database
 
 # Python Modules
-from os import path
 from io import StringIO
 from typing import Dict, Optional, Union
 from pickle import load
-from pathlib import Path
 
 # Third-Party Modules
 from textfsm import TextFSM
-from appdirs import user_data_dir
 
 # Local Modules
 from version import __version__ as VERSION

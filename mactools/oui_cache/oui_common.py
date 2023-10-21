@@ -5,9 +5,6 @@ from sys import path as sys_path
 # Third Party Modules
 from appdirs import user_data_dir
 
-# Local Modules
-from mactools.macaddress import MacAddress
-
 # Add the project directory to sys.path
 sys_path.append(os_path.dirname(os_path.dirname(os_path.dirname(os_path.abspath(__file__)))))
 
