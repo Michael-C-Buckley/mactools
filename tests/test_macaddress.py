@@ -5,6 +5,8 @@ from re import match, Pattern
 from unittest import TestCase, main
 from typing import Optional
 
+from icecream import ic
+
 # Local Modules
 from tests.test_common import (
     create_random_hex_string,
@@ -159,7 +161,7 @@ class TestFunctions(TestCase):
 
     def test_magic_add(self):
         self.assertEqual(self.mac48+1, '60:26:AA:BB:99:CD')
-        # self.assertEqual(self.mac64+1, '00:11:AA:00:00:BB:99:DE')
+        self.assertEqual(self.mac64+1, '00:11:AA:00:00:BB:99:DE')
         
         self
 
@@ -169,7 +171,7 @@ class TestFunctions(TestCase):
             self.assertEqual(mac-mac, 0)
         # Testing MAC-and-number subtraction
         self.assertEqual(self.mac48-1, '60:26:AA:BB:99:CB')
-        # self.assertEqual(self.mac64, '00:11:AA:00:00:BB:99:DC')
+        self.assertEqual(self.mac64-1, '00:11:AA:00:00:BB:99:DC')
 
 
 if __name__ == '__main__':

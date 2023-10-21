@@ -11,7 +11,6 @@ if TYPE_CHECKING:
 
 from tests.test_common import (
     OUICache,
-    get_oui_cache,
     OUI_CORE_PATH,
     OUI_CLASSES_PATH,
     TEST_OUI_STRING,
@@ -21,8 +20,9 @@ from tests.test_common import (
 )
 
 from mactools.oui_cache.oui_core import (
+    get_oui_cache,
     get_oui_record,
-    get_oui_vendor
+    get_oui_vendor,
 )
 
 from mactools.oui_cache.oui_common import PICKLE_DIR

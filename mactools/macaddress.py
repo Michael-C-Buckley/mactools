@@ -237,12 +237,17 @@ class MacAddress:
     @classmethod
     def number_to_hex_mac(cls, input_number: int,
                           form: Notation = Notation.COLON,
+                          bit_length: int = 48,
                           *args, **kwargs) -> str:
         """
         Returns a hexadecimal representation for a MAC Address from a number
         """
-        return cls.format_mac_address(hex(input_number)[2:], form)
-    
+        clean_hex = hex(input_number)[2:]
+        fill_required = int(len(clean_hex) - (bit_length / 4))
+        leading_zeros = ''.zfill(fill_required)
+        filled_hex = f'{leading_zeros}{clean_hex}'
+        return cls.format_mac_address(filled_hex, form)
+
     @classmethod
     def number_to_binary(cls, input_number: int, bit_length: int) -> int:
         """
