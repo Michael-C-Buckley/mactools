@@ -18,7 +18,7 @@ setup(
     install_requires=[
         'textfsm',
         'appdirs',
-        'requests'
+        'httpx'
     ],
     keywords=['python','networking','network','mac','oui','ieee']
 )
