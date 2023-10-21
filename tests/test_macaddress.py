@@ -5,8 +5,6 @@ from re import match, Pattern
 from unittest import TestCase, main
 from typing import Optional
 
-from icecream import ic
-
 # Local Modules
 from tests.test_common import (
     create_random_hex_string,
