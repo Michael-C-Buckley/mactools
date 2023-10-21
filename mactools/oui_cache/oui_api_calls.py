@@ -3,9 +3,9 @@
 # Third-Party Libraries
 from httpx import get, Response
 
-def httpx_get(resource: str, verify: bool = False) -> Response:
+def httpx_get(resource: str, verify: bool = False, timeout: float = 10) -> Response:
     """"""
-    response: Response = get(resource, verify=verify)
+    response: Response = get(resource, verify=verify, timeout=timeout)
     response.raise_for_status()
     return response
 
@@ -13,7 +13,8 @@ def get_oui_text(verify: bool = False) -> Response:
     """
     Pulls down the IEEE OUI Text registry
     """
-    return httpx_get('https://standards-oui.ieee.org/oui/oui.txt', verify)
+    ieee_oui_url = 'https://standards-oui.ieee.org/oui/oui.txt'
+    return httpx_get(ieee_oui_url, verify, timeout=30)
 
 
 def vendor_oui_lookup(mac: str, verify: bool = False) -> str|None:

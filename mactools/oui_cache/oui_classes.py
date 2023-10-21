@@ -73,6 +73,4 @@ class OUICache:
         """
         makedirs(CACHE_DIR, exist_ok=True)
         with open(PICKLE_DIR, 'wb') as file:
-            from icecream import ic
-            ic(PICKLE_DIR)
             dump(self, file)

@@ -54,18 +54,28 @@ class TestOUICacheAPI(TestCase):
         cls.mock_response.status_code = 200
         cls.mock_response.text = TEST_RESPONSE_TEXT
 
-        cls.oui_text_patch = patch(f'{OUI_CORE_PATH}.get_oui_text', return_value=cls.mock_response)
-        cls.patchers.append(cls.oui_text_patch)
+        oui_text_patch = patch(f'{OUI_CORE_PATH}.get_oui_text', return_value=cls.mock_response)
+        cls.patchers.append(oui_text_patch)
 
         # Write Cache Test Replacements
-        test_cache_path = f'{OUI_CLASSES_PATH}.PICKLE_DIR'
-        write_test_path = PICKLE_DIR.replace('oui.pkl', 'test-oui.pkl')
-        cls.cache_write_patch = patch(test_cache_path, write_test_path)
-        cls.patchers.append(cls.cache_write_patch)
+        test_classes_cache_path = f'{OUI_CLASSES_PATH}.PICKLE_DIR'
+        test_core_pickle_path = f'{OUI_CORE_PATH}.PICKLE_DIR'
+
+        cls.write_test_path = PICKLE_DIR.replace('oui.pkl', 'test-oui.pkl')
+
+        classes_cache_write_patch = patch(test_classes_cache_path, cls.write_test_path)
+        cls.patchers.append(classes_cache_write_patch)
+        
+        core_cache_write_patch = patch(test_core_pickle_path, cls.write_test_path)
+        cls.patchers.append(core_cache_write_patch)
+
 
         # Test Version Override Patch
-        cls.version_patch = patch(f'{OUI_CLASSES_PATH}.VERSION', 'TEST')
-        cls.patchers.append(cls.version_patch)
+        classes_version_patch = patch(f'{OUI_CLASSES_PATH}.VERSION', 'TEST')
+        cls.patchers.append(classes_version_patch)
+
+        core_version_patch = patch(f'{OUI_CORE_PATH}.VERSION', 'TEST')
+        cls.patchers.append(core_version_patch)
 
         # Start Patchers
         for patcher in cls.patchers:
@@ -104,22 +114,15 @@ class TestOUICacheAPI(TestCase):
         """
         Test for writing an `OUICache` the user's cache file
         """
-        test_cache_path = f'{OUI_CLASSES_PATH}.PICKLE_DIR'
-        write_test_path = PICKLE_DIR.replace('oui.pkl', 'test-oui.pkl')
-
         local_cache = OUICache({TEST_OUI_STRING.upper(): TEST_RECORD})
         local_cache.cache_version = 'TEST'
         local_cache.write_oui_cache()
 
-        test_common_pickle_path = f'{OUI_CORE_PATH}.PICKLE_DIR'
+        new_oui_cache = get_oui_cache()
+        self.assertEqual(new_oui_cache.cache_version, 'TEST')
 
-        # IN-PROGRESS
-        # with patch(test_common_pickle_path, write_test_path):
-        #     new_oui_cache = get_oui_cache()
-        #     self.assertEqual(new_oui_cache.cache_version, 'TEST')
-
-        if path.exists(write_test_path):
-            remove(write_test_path)
+        if path.exists(self.write_test_path):
+            remove(self.write_test_path)
             
 
 class TestOUICacheRecords(TestCase):
@@ -145,7 +148,6 @@ class TestOUICacheRecords(TestCase):
         mac_oui = dummy.dummy_function(MAC48)
         self.assertEqual(TEST_OUI_STRING.upper(), str_oui)
         self.assertEqual(MAC48.clean_oui, mac_oui)
-        
 
     def test_get_record(self):
         """
