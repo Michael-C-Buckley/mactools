@@ -54,30 +54,15 @@ class TestOUICacheAPI(TestCase):
         cls.mock_response.status_code = 200
         cls.mock_response.text = TEST_RESPONSE_TEXT
 
+        cls.write_test_path = PICKLE_DIR.replace('oui.pkl', 'test-oui.pkl')
+
         oui_text_patch = patch(f'{OUI_CORE_PATH}.get_oui_text', return_value=cls.mock_response)
         cls.patchers.append(oui_text_patch)
 
-        # Write Cache Test Replacements
-        test_classes_cache_path = f'{OUI_CLASSES_PATH}.PICKLE_DIR'
-        test_core_pickle_path = f'{OUI_CORE_PATH}.PICKLE_DIR'
+        for oui_path in [OUI_CLASSES_PATH, OUI_CORE_PATH]:
+            cls.patchers.append(patch(f'{oui_path}.VERSION', 'TEST'))
+            cls.patchers.append(patch(f'{oui_path}.PICKLE_DIR', cls.write_test_path))
 
-        cls.write_test_path = PICKLE_DIR.replace('oui.pkl', 'test-oui.pkl')
-
-        classes_cache_write_patch = patch(test_classes_cache_path, cls.write_test_path)
-        cls.patchers.append(classes_cache_write_patch)
-        
-        core_cache_write_patch = patch(test_core_pickle_path, cls.write_test_path)
-        cls.patchers.append(core_cache_write_patch)
-
-
-        # Test Version Override Patch
-        classes_version_patch = patch(f'{OUI_CLASSES_PATH}.VERSION', 'TEST')
-        cls.patchers.append(classes_version_patch)
-
-        core_version_patch = patch(f'{OUI_CORE_PATH}.VERSION', 'TEST')
-        cls.patchers.append(core_version_patch)
-
-        # Start Patchers
         for patcher in cls.patchers:
             patcher.start()
     
@@ -92,15 +77,24 @@ class TestOUICacheAPI(TestCase):
 
     def test_get_new_cache(self):
         """
-        Test successful creation of the test cache
+        Test creation of the test cache
         """
         local_cache = get_oui_cache(rebuild=True)
         self.assertIsInstance(local_cache, OUICache)
         self.assertEqual(local_cache.get_record(TEST_OUI_STRING), TEST_RECORD)
         self.assertEqual(local_cache.get_vendor(TEST_OUI_STRING), TEST_RECORD.vendor)
 
-        # Check for the exception case on `get_oui_cache`
-        ## write cache with a bad attr, get it
+    def test_get_cache_exceptions(self):
+        """
+        Test exception cases of `get_oui_cache`
+        """
+        local_cache = get_oui_cache(rebuild=False)
+        delattr(local_cache, 'cache_version')
+        local_cache.write_oui_cache()
+
+        new_cache = get_oui_cache(rebuild=False)
+        self.assertEqual(new_cache.cache_version, 'TEST')
+         
 
     def test_get_cache_404(self):
         """
