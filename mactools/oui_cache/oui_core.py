@@ -38,6 +38,8 @@ def build_oui_cache(save_cache: bool = True) -> Optional[OUICache]:
     if save_cache:
         oui_cache.write_oui_cache()
 
+    # ADD FIXED MACS
+
     return oui_cache
 
 def get_oui_cache(rebuild: bool = False, save_cache: bool = True) -> OUICache:
