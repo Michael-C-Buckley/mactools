@@ -16,7 +16,6 @@ from tests.test_common import (
     TEST_OUI_STRING,
     TEST_RECORD,
     TEST_CACHE,
-    MAC48,
 )
 
 from mactools.oui_cache.oui_core import (
@@ -35,12 +34,6 @@ TEST_RESPONSE_TEXT = '''
 				San Jose  CA  94568
 				US
 '''
-
-class DecoratorDummyClass:
-    @OUICache.prepare_oui
-    def dummy_function(self, oui):
-        return oui
-
 
 class TestOUICacheAPI(TestCase):
     """
@@ -134,22 +127,16 @@ class TestOUICacheRecords(TestCase):
     def tearDownClass(cls):
         cls.cache_patcher.stop()
 
-    def test_prepare_oui(self):
-        """
-        Tests all cases of OUI preparation
-        """
-        dummy = DecoratorDummyClass()
-        str_oui = dummy.dummy_function(TEST_OUI_STRING)
-        mac_oui = dummy.dummy_function(MAC48)
-        self.assertEqual(TEST_OUI_STRING.upper(), str_oui)
-        self.assertEqual(MAC48.clean_oui, mac_oui)
-
     def test_get_record(self):
         """
         Standard test of fetching a single record
         """
         test_get = get_oui_record(TEST_OUI_STRING)
         self.assertEqual(test_get, TEST_RECORD)
+
+        # Unique case for getting specified/reserved MAC records
+        test_get_fixed = get_oui_record('3333EA')
+        self.assertEqual(test_get_fixed.vendor, 'IPv6 Multicast')
 
     def test_get_vendor(self):
         """

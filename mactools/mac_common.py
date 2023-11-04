@@ -1,10 +1,12 @@
 from typing import Union
 
+from mactools.macaddress import MacAddress
+
 def fill_hex(raw_input: Union[str, int], required_length: int):
     """
     Returns a hex string of `length` padded with leading zeros
     """
-    case_dict = {
+    case_dict: dict[type, callable] = {
         int: lambda arg: hex(arg)[2:].upper(),
         str: lambda arg: arg.strip().upper()
     }
@@ -23,3 +25,13 @@ def hex_range(varying_chars: int, fixed_start: str = '', fixed_end: str = '',) -
     for i in range(16**varying_chars):
         fill_part = fill_hex(i, varying_chars)
         yield f'{fixed_start}{fill_part}{fixed_end}'
+
+def prepare_oui(input_mac: Union[MacAddress, str]) -> str:
+        """
+        Takes a MAC or OUI and strips and prepares a unified clean OUI
+        """
+        if isinstance(input_mac, str):
+            oui = MacAddress.clean_mac_address(input_mac)[0:6].upper()
+        elif isinstance(input_mac, MacAddress):
+            oui = input_mac.clean_oui
+        return oui

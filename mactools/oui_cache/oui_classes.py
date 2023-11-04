@@ -1,20 +1,24 @@
 # OUI Cache Classes
 
 # Python Modules
-from typing import Any, Dict, Optional, Union
 from dataclasses import dataclass
 from datetime import datetime
 from os import makedirs
 from pickle import dump
+from re import search
+from typing import Dict, Optional
 
 # Local Modules
 from mactools.oui_cache.oui_common import (
     CACHE_DIR,
     PICKLE_DIR,
-    VERSION
+    VERSION,
+    fixed_ouis,
+    specific_macs,
+    mac_ranges
 )
 
-from mactools.macaddress import MacAddress
+from mactools.mac_common import prepare_oui
 
 @dataclass
 class OUIRecord:
@@ -40,25 +44,31 @@ class OUICache:
         self.timestamp: datetime = datetime.now()
         self.oui_dict: Dict[str, OUIRecord] = oui_dict
     
-    def prepare_oui(func: callable) -> callable:
-        """
-        Takes a MAC or OUI and strips and prepares a unified clean OUI
-        """
-        def wrapper(self, func_input: Union[MacAddress, str]) -> Any:
-            if isinstance(func_input, str):
-                oui = MacAddress.clean_mac_address(func_input)[0:6].upper()
-            elif isinstance(func_input, MacAddress):
-                oui = func_input.clean_oui
-            return func(self, oui)
-        return wrapper
-    
-    @prepare_oui
-    def get_record(self, oui: str) -> Optional[OUIRecord]:
+    def get_record(self, input_mac: str) -> Optional[OUIRecord]:
         """
         Returns a single `OUIRecord`
         """
-        return self.oui_dict.get(oui)
-    
+        oui = prepare_oui(input_mac)
+
+        def check_range(input_mac: str):
+            for mac_criteria, info in mac_ranges.items():
+                if search(mac_criteria, input_mac):
+                    return info
+
+        func_dict = {
+            specific_macs.get: input_mac,
+            fixed_ouis.get: input_mac,
+            check_range: input_mac,
+            self.oui_dict.get: oui
+        }
+
+        for func, input_val in func_dict.items():
+            result = func(input_val)
+            if result:
+                if not isinstance(result, OUIRecord):
+                    result = OUIRecord(oui, result)
+                return result
+
     def get_vendor(self, oui: str) -> Optional[str]:
         """
         Returns the vendor of an OUI
