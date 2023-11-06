@@ -1,7 +1,7 @@
 # OUI Cache Setup
 
 from setuptools import setup, find_packages
-from version import __version__
+from mactools.version import __version__
 
 DESCRIPTION = 'MacTools',
 LONG_DESCRIPTION = 'MAC Address-focused library similar to `ipaddress`'

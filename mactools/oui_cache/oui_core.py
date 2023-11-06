@@ -9,7 +9,7 @@ from pickle import load
 from textfsm import TextFSM
 
 # Local Modules
-from version import __version__ as VERSION
+from mactools.version import __version__ as VERSION
 from mactools.oui_cache.oui_api_calls import get_oui_text
 from mactools.oui_cache.oui_template import OUI_TEMPLATE
 from mactools.oui_cache.oui_classes import OUICache, OUIRecord

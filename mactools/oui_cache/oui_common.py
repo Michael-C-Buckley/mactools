@@ -10,7 +10,7 @@ from appdirs import user_data_dir
 sys_path.append(os_path.dirname(os_path.dirname(os_path.dirname(os_path.abspath(__file__)))))
 
 # Common Re-used Imports
-from version import __version__ as VERSION
+from mactools.version import __version__ as VERSION
 
 # Cache file constants base, file will also include the Cache type
 CACHE_DIR = user_data_dir('python3-mactools')
