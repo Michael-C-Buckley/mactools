@@ -10,15 +10,17 @@ from httpx import get, Response
 # Local Libraries
 from mactools.macaddress import MacAddress
 from mactools.oui_cache.oui_classes import OUIRecord
+from mactools.mac_common import fill_hex
 
 
 def prepare_mac(func: callable, *args) -> callable:
     """
-    Decorator for handling strings or `MacAddress` input variables
+    Decorator for handling strings or `MacAddress` input variables.
+    Pads out strings to create a psuedo-MAC for proper object functioning.
     """
     def wrapper(func_input: Union[str, MacAddress], *args):
         if not isinstance(func_input, MacAddress):
-            func_input = MacAddress(func_input)
+            func_input = MacAddress(fill_hex(func_input, 12, backfill=True))
         return func(func_input, *args)
     return wrapper
 
@@ -59,5 +61,3 @@ def mac_lookup_call(mac: Union[str, MacAddress], verify: bool = False):
         'vendor': payload.get('company'),
     }
     return OUIRecord(**record_dict)
-
-mac_lookup_call('6026aa001122')

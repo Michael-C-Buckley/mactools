@@ -2,7 +2,7 @@ from typing import Union
 
 from mactools.macaddress import MacAddress
 
-def fill_hex(raw_input: Union[str, int], required_length: int):
+def fill_hex(raw_input: Union[str, int], required_length: int, backfill: bool = False):
     """
     Returns a hex string of `length` padded with leading zeros
     """
@@ -14,7 +14,13 @@ def fill_hex(raw_input: Union[str, int], required_length: int):
     prepared_input = case_func(raw_input)
     fill_length = int(required_length - len(prepared_input))
     filler_zeros = ''.zfill(fill_length)
-    return f'{filler_zeros}{prepared_input}'
+
+    output_dict: dict[bool, str] = {
+         False: f'{filler_zeros}{prepared_input}',
+         True: f'{prepared_input}{filler_zeros}'
+    }
+
+    return output_dict.get(backfill)
 
 def hex_range(varying_chars: int, fixed_start: str = '', fixed_end: str = '',) -> str:
     """
