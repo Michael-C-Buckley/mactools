@@ -9,7 +9,7 @@ LONG_DESCRIPTION = 'MAC Address-focused library similar to `ipaddress`'
 
 
 setup(
-    name='oui_cache',
+    name='MacTools',
     author='Michael Buckley',
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
