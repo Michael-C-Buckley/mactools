@@ -8,7 +8,7 @@ def fill_hex(raw_input: Union[str, int], required_length: int, backfill: bool = 
     """
     case_dict: dict[type, callable] = {
         int: lambda arg: hex(arg)[2:].upper(),
-        str: lambda arg: arg.strip().upper()
+        str: lambda arg: str(arg).strip().upper()
     }
     case_func = case_dict.get(type(raw_input))
     prepared_input = case_func(raw_input)
