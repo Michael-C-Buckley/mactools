@@ -98,6 +98,7 @@ class MacAddress:
             if mac_match:
                 return value
             
+        # Returns type `int` but implicit `False`
         return 0
 
     # PROPERTIES

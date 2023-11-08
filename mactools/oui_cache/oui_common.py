@@ -12,7 +12,7 @@ sys_path.append(os_path.dirname(os_path.dirname(os_path.dirname(os_path.abspath(
 # Common Re-used Imports
 from mactools.version import __version__ as VERSION
 
-# Cache file constants base, file will also include the Cache type
+# Cache file constants
 CACHE_DIR = user_data_dir('python3-mactools')
 PICKLE_DIR = os_path.join(CACHE_DIR, 'oui.pkl')
 
@@ -25,16 +25,16 @@ fixed_ouis: dict[str, str] = {
 }
 
 specific_macs: dict[str, str] = {
-    '0180C200000E': 'Link Layer Discovery Protocol',
-    '01000CCCCCAB': 'Cisco UniDirectional Link Detection',
+    '0180C200000E': 'Link Layer Discovery Protocol (LLDP)',
+    '01000CCCCCAB': 'Cisco UniDirectional Link Detection (UDLD)',
     '01000CCCCCCC': 'Cisco CDP/VTP/DTP',
-    '01000CCCCCAA': 'Cisco Port Aggregation Protocol',
+    '01000CCCCCAA': 'Cisco Port Aggregation Protocol (PAgP)',
     '00E02B000004': 'Extreme Networks Standby Protocol'
 }
 
 mac_ranges: dict[str, str] = {
     r'3333[0-9A-Fa-f]{2}': 'IPv6 Multicast',
     r'0180C200000[0-9A-Fa-f]': 'Spanning Tree Protocol (STP)',
-    r'00005E0001[0-9A-Fa-f]{2}': 'Virtual Router Redundancy Protocol',
+    r'00005E0001[0-9A-Fa-f]{2}': 'Virtual Router Redundancy Protocol (VRRP)',
     r'00000C07AC[0-9A-Fa-f]{2}': 'Cisco HSRP/GLBP',
 }
