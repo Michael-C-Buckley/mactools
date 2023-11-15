@@ -2,6 +2,8 @@
 
 MacTools is a MAC-centric library for aiding in network handling and automation.
 
+Full test coverage and fully type annoted.
+
 ## Installation
 
 This is a publicly available library on PyPI and can be installed with:

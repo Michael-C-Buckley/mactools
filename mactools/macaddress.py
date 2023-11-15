@@ -18,9 +18,10 @@ class Notation(Enum):
 
 ## Universal
 HEX_REGEX = r'[a-fA-F0-9]'
-MAC_PORTION_REGEX = f'{HEX_REGEX}{{2}}[:\-\. ]?'
-EUI48_MAC_REGEX = compile(f'({MAC_PORTION_REGEX}){{6}}')
-EUI64_MAC_REGEX = compile(f'({MAC_PORTION_REGEX}){{8}}')
+HEX_PAIR = f'{HEX_REGEX}{{2}}'
+MAC_PORTION_REGEX = f'{HEX_PAIR}[:\-\. ]?'
+EUI48_MAC_REGEX = compile(f'({MAC_PORTION_REGEX}){{5}}{HEX_PAIR}')
+EUI64_MAC_REGEX = compile(f'({MAC_PORTION_REGEX}){{7}}{HEX_PAIR}')
 
 class MacAddress:
     """
