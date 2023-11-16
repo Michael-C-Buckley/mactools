@@ -1,7 +1,10 @@
 # MacTools OUI Cache Setup
 
+# Python Modules
 from setuptools import setup, find_packages
-from mactools.version import __version__
+
+# Local Modules
+from mactools import __version__
 
 DESCRIPTION = 'MAC Address-focused library similar to `ipaddress`',
 

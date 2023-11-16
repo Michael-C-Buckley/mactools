@@ -20,10 +20,12 @@ def build_oui_cache(save_cache: bool = True) -> Optional[OUICache]:
     """
     Gets the IEEE OUI Text and creates the pickle the cache
     """
-    print('OUI: Fetching IEEE file...')
+    print('MacTools: Fetching IEEE file...', end='\r')
     oui_response = get_oui_text()
     if oui_response.status_code != 200:
+        print('MacTools: Failed to get IEEE file.')
         return None
+    print('MacTools: IEEE file successfully obtained.')
     
     template = TextFSM(StringIO(OUI_TEMPLATE))
     output = template.ParseTextToDicts(oui_response.text)
@@ -53,7 +55,7 @@ def get_oui_cache(rebuild: bool = False, save_cache: bool = True) -> OUICache:
                 if isinstance(oui_cache.cache_version, str):
                     if VERSION == oui_cache.cache_version:
                         return oui_cache
-        except (AttributeError, FileNotFoundError):
+        except (AttributeError, FileNotFoundError, ModuleNotFoundError):
             pass
     
     return build_oui_cache(save_cache)

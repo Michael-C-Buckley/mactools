@@ -9,6 +9,8 @@ from re import search
 from typing import Dict, Optional
 
 # Local Modules
+from mactools.mac_common import prepare_oui
+
 from mactools.oui_cache.oui_common import (
     CACHE_DIR,
     PICKLE_DIR,
@@ -17,8 +19,6 @@ from mactools.oui_cache.oui_common import (
     specific_macs,
     mac_ranges
 )
-
-from mactools.mac_common import prepare_oui
 
 @dataclass
 class OUIRecord:
