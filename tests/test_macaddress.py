@@ -7,8 +7,6 @@ from typing import Optional
 
 # Local Modules
 from tests.test_common import (
-    create_random_hex_string,
-    create_random_mac,
     SAMPLE_EUI48,
     SAMPLE_EUI64,
     TestMac,
@@ -16,13 +14,19 @@ from tests.test_common import (
     TEST_CACHE
 )
 
+from mactools import (
+    MacAddress,
+    create_random_hex_string,
+    create_random_mac,
+)
+
 from mactools.macaddress import (
     MacAddress,
-    Notation,
-    HEX_REGEX,
-    MAC_PORTION_REGEX,
-    EUI48_MAC_REGEX,
-    EUI64_MAC_REGEX,
+    MacNotation,
+    HEX_PATTERN,
+    MAC_PORTION,
+    EUI48_REGEX,
+    EUI64_REGEX,
 )
 
 
@@ -40,15 +44,15 @@ class TestFunctions(TestCase):
 
     def test_regex(self):
         fixed_lookup: dict[Pattern[str], str] = {
-            EUI48_MAC_REGEX: SAMPLE_EUI48.mac,
-            EUI64_MAC_REGEX: SAMPLE_EUI64.mac
+            EUI48_REGEX: SAMPLE_EUI48.mac,
+            EUI64_REGEX: SAMPLE_EUI64.mac
         }
 
         random_lookup: dict[Pattern[str], str] = {
-            HEX_REGEX: f'{create_random_hex_string()}',
-            MAC_PORTION_REGEX: f'{create_random_hex_string()}:',
-            EUI48_MAC_REGEX: create_random_mac(),
-            EUI64_MAC_REGEX: create_random_mac(64),
+            HEX_PATTERN: f'{create_random_hex_string()}',
+            MAC_PORTION: f'{create_random_hex_string()}:',
+            EUI48_REGEX: create_random_mac(),
+            EUI64_REGEX: create_random_mac(64),
         }
 
         for case_lookup in [fixed_lookup, random_lookup]:
@@ -70,8 +74,8 @@ class TestFunctions(TestCase):
 
         valid_macs: list[str] = [SAMPLE_EUI48.decimal]
         for eui in [48, 64]:
-            for notation in Notation:
-                valid_macs.append(create_random_mac(eui, notation))
+            for mac_MacNotation in MacNotation:
+                valid_macs.append(create_random_mac(eui, mac_MacNotation))
 
         for valid_mac in valid_macs:
             self.assertIsInstance(MacAddress(valid_mac), MacAddress)

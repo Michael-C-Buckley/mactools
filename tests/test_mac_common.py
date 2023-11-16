@@ -1,11 +1,18 @@
 # Tests for `mac_common.py`
 
+# Python Modules
 from unittest import TestCase, main
 
-from mactools.mac_common import (
+# Local Modules
+from mactools.macaddress import MAC_PATTERN
+
+from mactools import (
     fill_hex,
     hex_range,
-    prepare_oui
+    prepare_oui,
+    create_random_hex_bit,
+    create_random_hex_string,
+    create_random_mac,
 )
 
 from tests.test_common import (
@@ -13,6 +20,7 @@ from tests.test_common import (
     MAC64,
     SAMPLE_EUI48,
     SAMPLE_EUI64,
+    test_regex_comparison,
 )
 
 class TestMACCommon(TestCase):
@@ -47,6 +55,7 @@ class TestMACCommon(TestCase):
         """
         Tests for the various cases of `prepare_oui`
         """
+        # These OUIs are from the pre-defined sample MACs used in testing
         test_48_oui = '6026AA'
         test_64_oui = '0011AA'
 
@@ -57,6 +66,45 @@ class TestMACCommon(TestCase):
         for test_case_64 in [MAC64, SAMPLE_EUI64.mac]:
             result = prepare_oui(test_case_64)
             self.assertEqual(result, test_64_oui)
+
+        with self.assertRaises(TypeError):
+            prepare_oui(100)
+
+    def test_create_random_hex_bit(self):
+        """
+        Test for creating hex bits
+        """
+        test_regex_comparison(self, r'[A-F\d]', create_random_hex_bit, 1600)
+
+    def test_create_random_hex_string(self):
+        """
+        Test for creating hex strings
+        """
+        local_kwargs = {
+            'test_obj': self,
+            'test_func': create_random_hex_string,
+            'test_samples': 100,
+        }
+        for test_case in range(1, 10):
+            local_kwargs['pattern'] = r'[A-F\d]{' + str(test_case) + '}'
+            local_kwargs['test_arg'] = test_case
+            test_regex_comparison(**local_kwargs)
+
+    def test_create_random_mac(self):
+        """
+        Test for creating MAC addresses
+        """
+        local_kwargs = {
+            'test_obj': self,
+            'test_func': create_random_mac,
+            'test_samples': 100,
+            'pattern': MAC_PATTERN,
+        }
+        for eui in [48, 64]:
+            test_regex_comparison(**local_kwargs, test_arg=eui)
+
+        with self.assertRaises(ValueError):
+            create_random_mac(eui=999)
 
 
 if __name__ == '__main__':

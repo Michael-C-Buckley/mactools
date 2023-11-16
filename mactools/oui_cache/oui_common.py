@@ -1,7 +1,6 @@
 # Python Modules
 from os import path as os_path
 from sys import path as sys_path
-from typing import Union
 
 # Third Party Modules
 from appdirs import user_data_dir

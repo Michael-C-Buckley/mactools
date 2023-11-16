@@ -9,25 +9,27 @@ if TYPE_CHECKING:
 
 from functools import cached_property
 
-class Notation(Enum):
+class MacNotation(Enum):
     CLEAN = ''
     COLON = ':'
     PERIOD = '.'
     HYPHEN = '-'
     SPACE = ' '
 
-## Universal
-HEX_REGEX = r'[a-fA-F0-9]'
-HEX_PAIR = f'{HEX_REGEX}{{2}}'
-MAC_PORTION_REGEX = f'{HEX_PAIR}[:\-\. ]?'
-EUI48_MAC_REGEX = compile(f'({MAC_PORTION_REGEX}){{5}}{HEX_PAIR}')
-EUI64_MAC_REGEX = compile(f'({MAC_PORTION_REGEX}){{7}}{HEX_PAIR}')
+HEX_PATTERN = r'[a-fA-F0-9]'
+HEX_PAIR = f'{HEX_PATTERN}{{2}}'
+MAC_PORTION = f'{HEX_PAIR}[:\-\. ]?'
+EUI48_PATTERN = f'({MAC_PORTION}){{5}}{HEX_PAIR}'
+EUI64_PATTERN = f'({MAC_PORTION}){{7}}{HEX_PAIR}'
+MAC_PATTERN = f'{EUI48_PATTERN}|{EUI64_PATTERN}'
+EUI48_REGEX = compile(EUI48_PATTERN)
+EUI64_REGEX = compile(EUI64_PATTERN)
 
 class MacAddress:
     """
     Wrapper and handler for MAC Addresses
     """
-    def __init__(self, mac: Union[str, int], format: Notation = Notation.COLON,
+    def __init__(self, mac: Union[str, int], format: MacNotation = MacNotation.COLON,
                  oui_cache: 'OUICache' = None):
         
         eui = self.validate_mac(mac)
@@ -44,11 +46,11 @@ class MacAddress:
 
     def __str__(self):
         format_map = {
-            Notation.CLEAN: self.clean,
-            Notation.COLON: self.colon,
-            Notation.PERIOD: self.period,
-            Notation.HYPHEN: self.hyphen,
-            Notation.SPACE: self.space,
+            MacNotation.CLEAN: self.clean,
+            MacNotation.COLON: self.colon,
+            MacNotation.PERIOD: self.period,
+            MacNotation.HYPHEN: self.hyphen,
+            MacNotation.SPACE: self.space,
         }
         return format_map.get(self.format)
     
@@ -90,8 +92,8 @@ class MacAddress:
         mac_candidate = mac_input.strip()
 
         match_case = {
-            EUI64_MAC_REGEX: 64,
-            EUI48_MAC_REGEX: 48
+            EUI64_REGEX: 64,
+            EUI48_REGEX: 48
         }
 
         for regex, value in match_case.items():
@@ -124,7 +126,7 @@ class MacAddress:
         """
         Return a clean OUI
         """
-        mac = self.format_mac_address(self.__mac, Notation.CLEAN)
+        mac = self.format_mac_address(self.__mac, MacNotation.CLEAN)
         return mac[0:6]
 
     @cached_property
@@ -136,8 +138,8 @@ class MacAddress:
 
         # The string length will vary between 6 to 8 depending on delimiters
         slice_pad = {
-            Notation.CLEAN: 0,
-            Notation.PERIOD: 1,
+            MacNotation.CLEAN: 0,
+            MacNotation.PERIOD: 1,
         }
 
         return mac[0:6+slice_pad.get(self.format, 2)]
@@ -168,28 +170,28 @@ class MacAddress:
         """
         Returns the Colon-separated Form
         """
-        return self.format_mac_address(self.__mac, Notation.COLON)
+        return self.format_mac_address(self.__mac, MacNotation.COLON)
     
     @cached_property
     def period(self) -> str:
         """
         Returns the Period-separated Form
         """
-        return self.format_mac_address(self.__mac, Notation.PERIOD)
+        return self.format_mac_address(self.__mac, MacNotation.PERIOD)
     
     @cached_property
     def hyphen(self) -> str:
         """
         Returns the Hyphen-separated Form
         """
-        return self.format_mac_address(self.__mac, Notation.HYPHEN)
+        return self.format_mac_address(self.__mac, MacNotation.HYPHEN)
     
     @cached_property
     def space(self) -> str:
         """
         Returns the Space-separated Form
         """
-        return self.format_mac_address(self.__mac, Notation.SPACE)
+        return self.format_mac_address(self.__mac, MacNotation.SPACE)
     
     # CONVERSION METHODS
 
@@ -205,7 +207,7 @@ class MacAddress:
 
     @classmethod
     def format_mac_address(cls, mac_address: str,
-                           delimiter: Notation = Notation.COLON, 
+                           delimiter: MacNotation = MacNotation.COLON, 
                            case: str = 'upper',
                            *args, **kwargs):
         """
@@ -238,7 +240,7 @@ class MacAddress:
     
     @classmethod
     def number_to_hex_mac(cls, input_number: int,
-                          form: Notation = Notation.COLON,
+                          form: MacNotation = MacNotation.COLON,
                           bit_length: int = 48,
                           *args, **kwargs) -> str:
         """

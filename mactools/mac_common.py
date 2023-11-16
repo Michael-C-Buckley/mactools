@@ -1,6 +1,11 @@
-from typing import Union
+# MacTools Common Module
 
-from mactools.macaddress import MacAddress
+# Python Modules
+from random import randint
+from typing import Literal, Union
+
+# Local Modules
+from mactools.macaddress import MacAddress, MacNotation
 
 def fill_hex(raw_input: Union[str, int], required_length: int, backfill: bool = False):
     """
@@ -40,4 +45,35 @@ def prepare_oui(input_mac: Union[MacAddress, str]) -> str:
             oui = MacAddress.clean_mac_address(input_mac)[0:6].upper()
         elif isinstance(input_mac, MacAddress):
             oui = input_mac.clean_oui
+        else:
+             raise TypeError('Argument must be `str` or `MacAddress`')
         return oui
+
+# Create Random MAC or Hex
+
+def create_random_hex_bit():
+    """
+    Returns a single bit between 0-9 or A-F
+    """
+    return hex(randint(0, 15))[2:3].upper()
+
+def create_random_hex_string(length: int = 2):
+    """
+    Returns a hex string of specified length
+    """
+    bit_list = [create_random_hex_bit() for _ in range(length)]
+    return ''.join(bit_list)
+
+def create_random_mac(eui: Literal[48, 64] = 48, delimiter: MacNotation = MacNotation.COLON):
+    """
+    Returns a valid random MAC address
+    """
+    eui = int(eui)
+    if eui not in [48, 64]:
+        raise ValueError('EUI might be either `48` or `64`')
+
+    hex_length = 4 if delimiter == MacNotation.PERIOD else 2
+    segments = eui/(4*hex_length)
+    
+    mac_portions = [create_random_hex_string(hex_length) for _ in range(int(segments))]
+    return delimiter.value.join(mac_portions)

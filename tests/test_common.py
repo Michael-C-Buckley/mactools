@@ -2,14 +2,12 @@
 
 # Python Modules
 from dataclasses import dataclass
-from random import randint
-from typing import Literal
+from re import search, compile, Match
+from typing import Any
+from unittest import TestCase
 
 # Local Modules
-from mactools.macaddress import (
-    MacAddress,
-    Notation
-)
+from mactools import MacAddress
 
 from mactools.oui_cache.oui_classes import (
     OUICache,
@@ -53,29 +51,17 @@ SAMPLE_EUI64 = TestMac('00:11:AA:00:00:BB:99:DD',
 MAC48 = MacAddress(SAMPLE_EUI48.mac)
 MAC64 = MacAddress(SAMPLE_EUI64.mac)
 
-def create_random_hex_bit():
-    """
-    Returns a single bit between 0-9 or A-F
-    """
-    return hex(randint(0, 15))[2:3].upper()
 
-def create_random_hex_string(length: int = 2):
+def test_regex_comparison(test_obj: TestCase, pattern: str, test_func: callable,
+        test_samples: int, test_arg: Any = None):
     """
-    Returns a hex string of specified length
+    Internal test method for testing to make sure it matches
     """
-    bit_list = [create_random_hex_bit() for _ in range(length)]
-    return ''.join(bit_list)
-
-def create_random_mac(eui: Literal[48, 64] = 48, delimiter: Notation = Notation.COLON):
-    """
-    Returns a valid random MAC address
-    """
-    eui = int(eui)
-    if eui not in [48, 64]:
-        raise ValueError('EUI might be either `48` or `64`')
-
-    hex_length = 4 if delimiter == Notation.PERIOD else 2
-    segments = eui/(4*hex_length)
-    
-    mac_portions = [create_random_hex_string(hex_length) for _ in range(int(segments))]
-    return delimiter.value.join(mac_portions)
+    test_regex = compile(pattern)
+    if test_arg:
+        test_list = [test_func(test_arg) for _ in range(test_samples)]
+    else:
+        test_list = [test_func() for _ in range(test_samples)]
+    for test_sample in test_list:
+        test_match = search(test_regex, test_sample)
+        test_obj.assertIsInstance(test_match, Match)
