@@ -16,14 +16,11 @@ from tests.test_common import (
 
 from mactools import (
     MacAddress,
+    MacNotation,
     create_random_hex_string,
     create_random_mac,
 )
 
-from mactools.macaddress import (
-    MacAddress,
-    MacNotation,
-)
 from mactools.basemac import (
     HEX_PATTERN,
     MAC_PORTION,

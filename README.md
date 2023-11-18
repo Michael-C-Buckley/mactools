@@ -48,6 +48,8 @@ decimal, binary
 Local cache of the IEEE OUI MA-L registry for quick look-ups without needing to
 consistently hit API endpoints for individual queries.
 
+`MacAddress` currently automatically performs the look-up on creation.
+
 The full information is available, including OUI, Vendor, Address, etc.
 
 The cache also contains specific references to commonly defined non-vendor OUIs
@@ -61,6 +63,10 @@ from the IEEE OUI MA-L registry.  The cache will be built if one is not present
 
 ```python
 from mactools import get_oui_cache
+
+# the `mac` defined above already has the look-up performed and recorded on creation, if the record was found
+
+vendor = mac.vendor
 
 cache = get_oui_cache()
 oui = '01000C'
