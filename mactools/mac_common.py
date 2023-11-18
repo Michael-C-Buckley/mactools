@@ -3,9 +3,10 @@
 # Python Modules
 from random import randint
 from typing import Literal, Union
+from re import search
 
 # Local Modules
-from mactools.macaddress import MacAddress, MacNotation
+from mactools.basemac import BaseMac, MacNotation
 
 def fill_hex(raw_input: Union[str, int], required_length: int, backfill: bool = False):
     """
@@ -37,16 +38,23 @@ def hex_range(varying_chars: int, fixed_start: str = '', fixed_end: str = '',) -
         fill_part = fill_hex(i, varying_chars)
         yield f'{fixed_start}{fill_part}{fixed_end}'
 
-def prepare_oui(input_mac: Union[MacAddress, str]) -> str:
+def prepare_oui(input_mac: Union[BaseMac, str, int]) -> str:
         """
         Takes a MAC or OUI and strips and prepares a unified clean OUI
         """
-        if isinstance(input_mac, str):
-            oui = MacAddress.clean_mac_address(input_mac)[0:6].upper()
-        elif isinstance(input_mac, MacAddress):
-            oui = input_mac.clean_oui
+        if isinstance(input_mac, (int, str)):
+            try:
+                oui = BaseMac(input_mac).clean_oui
+            except ValueError:
+                if isinstance(input_mac, str):
+                    oui = BaseMac.clean_mac_address(input_mac)
+                else:
+                    oui = BaseMac.number_to_hex_mac(input_mac, MacNotation.CLEAN)
+                if not search(r'[A-F\d]{6}', oui):
+                    raise ValueError(f'{input_mac} is not a valid MAC address or OUI')
         else:
-             raise TypeError('Argument must be `str` or `MacAddress`')
+            oui = input_mac.clean_oui
+
         return oui
 
 # Create Random MAC or Hex

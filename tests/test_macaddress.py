@@ -23,6 +23,8 @@ from mactools import (
 from mactools.macaddress import (
     MacAddress,
     MacNotation,
+)
+from mactools.basemac import (
     HEX_PATTERN,
     MAC_PORTION,
     EUI48_REGEX,

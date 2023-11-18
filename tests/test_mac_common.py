@@ -4,7 +4,7 @@
 from unittest import TestCase, main
 
 # Local Modules
-from mactools.macaddress import MAC_PATTERN
+from mactools.basemac import MAC_PATTERN
 
 from mactools import (
     fill_hex,
@@ -67,7 +67,7 @@ class TestMACCommon(TestCase):
             result = prepare_oui(test_case_64)
             self.assertEqual(result, test_64_oui)
 
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             prepare_oui(100)
 
     def test_create_random_hex_bit(self):

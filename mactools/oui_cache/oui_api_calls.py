@@ -8,19 +8,19 @@ from typing import Union
 from httpx import get, Response
 
 # Local Libraries
-from mactools.macaddress import MacAddress
+from mactools.basemac import BaseMac
 from mactools.oui_cache.oui_classes import OUIRecord
 from mactools.mac_common import fill_hex
 
 
 def prepare_mac(func: callable, *args) -> callable:
     """
-    Decorator for handling strings or `MacAddress` input variables.
+    Decorator for handling strings or `BaseMac` input variables.
     Pads out strings to create a psuedo-MAC for proper object functioning.
     """
-    def wrapper(func_input: Union[str, MacAddress], *args):
-        if not isinstance(func_input, MacAddress):
-            func_input = MacAddress(fill_hex(func_input, 12, backfill=True))
+    def wrapper(func_input: Union[str, BaseMac], *args):
+        if not isinstance(func_input, BaseMac):
+            func_input = BaseMac(fill_hex(func_input, 12, backfill=True))
         return func(func_input, *args)
     return wrapper
 
@@ -40,7 +40,7 @@ def get_oui_text(verify: bool = False) -> Response:
     return httpx_get(ieee_oui_url, verify, timeout=30)
 
 @prepare_mac
-def vendor_oui_lookup(mac: Union[str, MacAddress], verify: bool = False) -> str|None:
+def vendor_oui_lookup(mac: Union[str, BaseMac], verify: bool = False) -> str|None:
     """
     REST request to look-up the OUI of a mac address and returns the vendor.
     URL has a rate limit of 2/s and daily limit of 10,000 calls.
@@ -48,7 +48,7 @@ def vendor_oui_lookup(mac: Union[str, MacAddress], verify: bool = False) -> str|
     return  httpx_get(f'https://api.maclookup.app/v2/macs/{mac.clean}/company/name', verify)
 
 @prepare_mac
-def mac_lookup_call(mac: Union[str, MacAddress], verify: bool = False):
+def mac_lookup_call(mac: Union[str, BaseMac], verify: bool = False):
     """
     REST request to get OUI info (WIP).
     URL has a rate limit of 2/s and daily limit of 10,000 calls.
