@@ -10,5 +10,6 @@ class MacAddress(BaseMac):
     Final class that merges `OUICache` instance into the `BaseMac` for
     look-ups automatically on creation and prevents circular dependencies
     """
-    def __init__(self, mac: str | int, format: MacNotation = MacNotation.COLON):
+    def __init__(self, mac: str | int, format: MacNotation = MacNotation.COLON,
+                 *args, **kwargs):
         super().__init__(mac, format, oui_cache)
