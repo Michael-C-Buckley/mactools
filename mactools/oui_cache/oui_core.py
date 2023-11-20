@@ -53,7 +53,7 @@ def get_oui_cache(rebuild: bool = False, save_cache: bool = True) -> OUICache:
                 if isinstance(oui_cache.cache_version, str):
                     if VERSION == oui_cache.cache_version:
                         return oui_cache
-        except (AttributeError, FileNotFoundError, ModuleNotFoundError):
+        except:
             pass
     
     return build_oui_cache(save_cache)
