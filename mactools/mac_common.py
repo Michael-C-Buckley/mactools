@@ -2,13 +2,13 @@
 
 # Python Modules
 from random import randint
-from typing import Literal, Union
+from typing import Union
 from re import search
 
 # Local Modules
 from mactools.basemac import BaseMac, MacNotation
 
-def fill_hex(raw_input: Union[str, int], required_length: int, backfill: bool = False):
+def fill_hex(raw_input: Union[str, int], required_length: int, backfill: bool = False) -> str:
     """
     Returns a hex string of `length` padded with leading zeros
     """
@@ -28,7 +28,7 @@ def fill_hex(raw_input: Union[str, int], required_length: int, backfill: bool = 
 
     return output_dict.get(backfill)
 
-def hex_range(varying_chars: int, fixed_start: str = '', fixed_end: str = '',) -> str:
+def hex_range(varying_chars: int, fixed_start: str = '', fixed_end: str = '') -> str:
     """
     Returns a generator which iterates creates a range of hex.
     `fixed_start` and `fixed_end` are the leading and trailing fixed portions.
@@ -50,7 +50,7 @@ def prepare_oui(input_mac: Union[BaseMac, str, int]) -> str:
                     oui = BaseMac.clean_mac_address(input_mac)
                 else:
                     oui = BaseMac.number_to_hex_mac(input_mac, MacNotation.CLEAN)
-                if not search(r'[A-F\d]{6}', oui):
+                if not search(r'[A-F\d]{6,16}', oui):
                     raise ValueError(f'{input_mac} is not a valid MAC address or OUI')
         else:
             oui = input_mac.clean_oui
@@ -59,26 +59,26 @@ def prepare_oui(input_mac: Union[BaseMac, str, int]) -> str:
 
 # Create Random MAC or Hex
 
-def create_random_hex_bit():
+def create_random_hex_bit() -> str:
     """
     Returns a single bit between 0-9 or A-F
     """
     return hex(randint(0, 15))[2:3].upper()
 
-def create_random_hex_string(length: int = 2):
+def create_random_hex_string(length: int = 2) -> str:
     """
     Returns a hex string of specified length
     """
     bit_list = [create_random_hex_bit() for _ in range(length)]
     return ''.join(bit_list)
 
-def create_random_mac(eui: Literal[48, 64] = 48, delimiter: MacNotation = MacNotation.COLON):
+def create_random_mac(eui: int = 48, delimiter: MacNotation = MacNotation.COLON) -> str:
     """
     Returns a valid random MAC address
     """
     eui = int(eui)
     if eui not in [48, 64]:
-        raise ValueError('EUI might be either `48` or `64`')
+        raise ValueError('EUI must be either `48` or `64`')
 
     hex_length = 4 if delimiter == MacNotation.PERIOD else 2
     segments = eui/(4*hex_length)

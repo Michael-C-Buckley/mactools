@@ -3,7 +3,7 @@
 from mactools.version import __version__
 
 from mactools.macaddress import MacAddress, MacNotation
-from mactools.oui_cache.oui_classes import OUICache, OUIRecord
+from mactools.oui_cache.oui_classes import OUICache
 
 from mactools.oui_cache.oui_core import (
     get_oui_cache,

@@ -1,11 +1,12 @@
 # MacTools Base MAC Address Class
 
+from __future__ import annotations
 from enum import Enum
 from re import compile, search
-from typing import Optional, Union, TYPE_CHECKING
+from typing import Dict, Optional, Union, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from mactools.oui_cache.oui_core import OUICache, OUIRecord
+    from mactools.oui_cache.oui_core import OUICache
 
 from functools import cached_property
 
@@ -38,7 +39,7 @@ class BaseMac:
         
         self.__mac = mac
         self.__eui = eui
-        self.__oui_record: 'OUIRecord' = None
+        self.__oui_record: Dict[str, str] = None
         self.format = format
 
         if oui_cache:
@@ -112,15 +113,8 @@ class BaseMac:
         Returns the vendor if the IEEE lookup was made
         """
         if self.__oui_record:
-            return self.__oui_record.vendor
+            return next(iter(self.__oui_record.values()))
         
-    @property
-    def ieee_record(self) -> Optional['OUIRecord']:
-        """
-        Returns the `OUIRecord` if it was added
-        """
-        return self.__oui_record
-
     @cached_property
     def clean_oui(self) -> str:
         """
@@ -212,7 +206,7 @@ class BaseMac:
     def format_mac_address(cls, mac_address: str,
                            delimiter: MacNotation = MacNotation.COLON, 
                            case: str = 'upper',
-                           *args, **kwargs):
+                           *args, **kwargs) -> str:
         """
         Takes a MAC address and re-formats it appropriately
         """

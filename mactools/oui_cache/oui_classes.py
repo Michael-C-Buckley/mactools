@@ -1,12 +1,12 @@
 # OUI Cache Classes
 
 # Python Modules
-from dataclasses import dataclass
 from datetime import datetime
+from enum import Enum
 from os import makedirs
 from pickle import dump
 from re import search
-from typing import Dict, Optional
+from typing import Dict
 
 # Local Modules
 from mactools.mac_common import prepare_oui
@@ -20,63 +20,69 @@ from mactools.oui_cache.oui_common import (
     mac_ranges
 )
 
-@dataclass
-class OUIRecord:
-    oui: str
-    vendor: str
-    hex_oui: str = None
-    street_address: str = None
-    city: str = None
-    state: str = None
-    postal_code: str = None
-    country: str = None
 
+class OUIType(Enum):
+    """
+    Differentiator for IEEE MAC OUI Registry sizes
+    """
+    OUI36 = 'MA-S'
+    OUI28 = 'MA-M'
+    OUI = 'MA-L'
+    
 
 class OUICache:
     """
-    Object holding the OUI Cache
+    Object for holding the OUI Cache
     """
-    def __init__(self, oui_dict: Dict[str, OUIRecord]):
-        """
-        Cache Objection - Version is the library version.
-        """
-        self.cache_version: str = VERSION
+    def __init__(self, oui_dict: Dict[OUIType, Dict[str, str]]) -> None:
+        self.version: str = VERSION
         self.timestamp: datetime = datetime.now()
-        self.oui_dict: Dict[str, OUIRecord] = oui_dict
-    
-    def get_record(self, input_mac: str) -> Optional[OUIRecord]:
+        self.oui_dict: Dict[OUIType, Dict[str, str]] = oui_dict
+
+    def get_record(self, input_mac: str) -> Dict[str, str]:
         """
-        Returns a single `OUIRecord`
+        Returns the assigned OUI and organization associated with a MAC or OUI
         """
         oui = prepare_oui(input_mac)
 
         def check_range(input_mac: str):
             for mac_criteria, info in mac_ranges.items():
                 if search(mac_criteria, input_mac):
-                    return info
-
+                    return {'oui': input_mac, 'vendor': info}
+                
         func_dict = {
-            specific_macs.get: input_mac,
-            fixed_ouis.get: input_mac,
-            check_range: input_mac,
-            self.oui_dict.get: oui
+            specific_macs.get: oui,
+            fixed_ouis.get: oui[:6],
+            check_range: oui,
         }
 
-        for func, input_val in func_dict.items():
-            result = func(input_val)
+        for func, input_mac in func_dict.items():
+            result = func(input_mac)
             if result:
-                if not isinstance(result, OUIRecord):
-                    result = OUIRecord(oui, result)
                 return result
 
-    def get_vendor(self, oui: str) -> Optional[str]:
+        key_length_map = {
+            OUIType.OUI36: 9,
+            OUIType.OUI28: 7,
+            OUIType.OUI: 6
+        }
+
+        for oui_type, key_len in key_length_map.items():
+            inner_dict: Dict[str, str] = self.oui_dict.get(oui_type)
+            if inner_dict is None:
+                continue
+            result = inner_dict.get(oui[:key_len])
+            if result:
+                return {'oui': oui[:key_len], 'vendor': result}
+            
+    def get_vendor(self, input_mac: str) -> str:
         """
-        Returns the vendor of an OUI
+        Returns the organization associated with an assignment
         """
-        record = self.get_record(oui)
-        if record:
-            return record.vendor
-    
+        record_dict = self.get_record(input_mac)
+        if record_dict:
+            return record_dict.get('vendor')
+        
     # File handling
     def write_oui_cache(self) -> None:
         """

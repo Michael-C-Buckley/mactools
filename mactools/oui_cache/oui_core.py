@@ -1,40 +1,54 @@
 # OUI Database
 
 # Python Modules
+from csv import reader
+from concurrent.futures import ThreadPoolExecutor as Executor
 from io import StringIO
 from typing import Dict, Optional, Union
 from pickle import load
 
-# Third-Party Modules
-from textfsm import TextFSM
-
 # Local Modules
 from mactools.version import __version__ as VERSION
-from mactools.oui_cache.oui_api_calls import get_oui_text
-from mactools.oui_cache.oui_template import OUI_TEMPLATE
-from mactools.oui_cache.oui_classes import OUICache, OUIRecord
+from mactools.oui_cache.oui_api_calls import get_oui_csv
+from mactools.oui_cache.oui_classes import OUICache, OUIType
 from mactools.oui_cache.oui_common import PICKLE_DIR
 
 
+def process_ieee_csv(csv: str) -> Dict[OUIType, Dict[str, str]]:
+    """
+    Converts the IEEE CSV response into a Python dictionary
+    """
+    csv_reader = reader(StringIO(csv))
+    entries = {}
+
+    # Skip the IEEE header line
+    next(csv_reader)
+
+    for record in csv_reader:
+        assignment_type, oui, vendor, address = record
+        entries[oui] = vendor
+
+    return {OUIType(assignment_type): entries}
+
 def build_oui_cache(save_cache: bool = True) -> Optional[OUICache]:
     """
-    Gets the IEEE OUI Text and creates the pickle the cache
+    Gets the IEEE OUI info, creates, and pickles the cache
     """
-    print('MacTools: Fetching IEEE file...', end='\r')
-    oui_response = get_oui_text()
-    if oui_response.status_code != 200:
-        print('MacTools: Failed to get IEEE file.')
-        return None
-    print('MacTools: IEEE file successfully obtained.')
-    
-    template = TextFSM(StringIO(OUI_TEMPLATE))
-    output = template.ParseTextToDicts(oui_response.text)
+    print('MacTools: Fetching IEEE info...', end='\r')
 
-    oui_dict: Dict[str, OUIRecord] = {}
+    with Executor(max_workers=3) as executor:
+        results = executor.map(get_oui_csv, OUIType)
 
-    for item in output:
-        oui = item['oui']
-        oui_dict[oui] = OUIRecord(**item)
+    oui_dict = {}
+    for response in results:
+        if response.status_code == 200:
+            oui_dict.update(process_ieee_csv(response.text))
+        else:
+            print('MacTools: Failed to get IEEE file.')
+            return None
+        
+
+    print('MacTools: IEEE info successfully obtained.')
 
     oui_cache = OUICache(oui_dict)
     if save_cache:
@@ -50,10 +64,10 @@ def get_oui_cache(rebuild: bool = False, save_cache: bool = True) -> OUICache:
         try:
             with open(PICKLE_DIR, 'rb') as file:
                 oui_cache: OUICache = load(file)
-                if isinstance(oui_cache.cache_version, str):
-                    if VERSION == oui_cache.cache_version:
+                if isinstance(oui_cache.version, str):
+                    if VERSION == oui_cache.version:
                         return oui_cache
-        except:
+        except Exception as e:
             pass
     
     return build_oui_cache(save_cache)
@@ -76,7 +90,7 @@ def get_oui_item(input_item: Union[str, list[str]],
     raise ValueError('Input must be either a string or list of strings')
 
 def get_oui_vendor(input_item: Union[str, list[str]],
-                   rebuild: bool = False) -> Optional[str]:
+                   rebuild: bool = False) -> str:
     """
     Simple function to request the vendor from a MAC/OUI or a list of them
     """
@@ -84,7 +98,7 @@ def get_oui_vendor(input_item: Union[str, list[str]],
     return get_oui_item(input_item, oui_cache.get_vendor)
 
 def get_oui_record(input_item: Union[str, list],
-                   rebuild: bool = False) -> Optional[OUIRecord]:
+                   rebuild: bool = False) -> Dict[str, str]:
     """
     Simple function to request `OUIRecord` from a MAC/OUI or a list of them
     """

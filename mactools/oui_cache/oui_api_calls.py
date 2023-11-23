@@ -2,14 +2,14 @@
 
 # Python Libraries
 from json import loads
-from typing import Union
+from typing import Union, Dict
 
 # Third-Party Libraries
 from httpx import get, Response
 
 # Local Libraries
 from mactools.basemac import BaseMac
-from mactools.oui_cache.oui_classes import OUIRecord
+from mactools.oui_cache import OUIType
 from mactools.mac_common import fill_hex
 
 
@@ -32,15 +32,21 @@ def httpx_get(resource: str, verify: bool = False, timeout: float = 10) -> Respo
     response.raise_for_status()
     return response
 
-def get_oui_text(verify: bool = False) -> Response:
+def get_oui_csv(version: OUIType = OUIType.OUI, verify: bool = False):
     """
-    Pulls down the IEEE OUI Text registry
+    Pulls down the CSV version of the appropriate IEEE standard in CSV form
     """
-    ieee_oui_url = 'https://standards-oui.ieee.org/oui/oui.txt'
-    return httpx_get(ieee_oui_url, verify, timeout=30)
+    base_url = 'https://standards-oui.ieee.org/'
+    url_map = {
+        OUIType.OUI: 'oui/oui.csv',
+        OUIType.OUI28: 'oui28/mam.csv',
+        OUIType.OUI36: 'oui36/oui36.csv'
+    }
+    url = f'{base_url}{url_map.get(version, OUIType.OUI)}'
+    return httpx_get(url, verify, timeout=60)
 
 @prepare_mac
-def vendor_oui_lookup(mac: Union[str, BaseMac], verify: bool = False) -> str|None:
+def vendor_oui_lookup(mac: Union[str, BaseMac], verify: bool = False) -> Dict[str, None]:
     """
     REST request to look-up the OUI of a mac address and returns the vendor.
     URL has a rate limit of 2/s and daily limit of 10,000 calls.
@@ -48,16 +54,10 @@ def vendor_oui_lookup(mac: Union[str, BaseMac], verify: bool = False) -> str|Non
     return  httpx_get(f'https://api.maclookup.app/v2/macs/{mac.clean}/company/name', verify)
 
 @prepare_mac
-def mac_lookup_call(mac: Union[str, BaseMac], verify: bool = False):
+def mac_lookup_call(mac: Union[str, BaseMac], verify: bool = False) -> Dict[str, str]:
     """
     REST request to get OUI info (WIP).
     URL has a rate limit of 2/s and daily limit of 10,000 calls.
     """
     response = httpx_get(f'https://api.maclookup.app/v2/macs/{mac.clean}', verify)
-    payload: dict[str, str] = loads(response.text)
-
-    record_dict = {
-        'oui': payload.get('macPrefix'),
-        'vendor': payload.get('company'),
-    }
-    return OUIRecord(**record_dict)
+    return loads(response.text)
