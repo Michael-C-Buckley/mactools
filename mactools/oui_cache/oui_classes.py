@@ -69,8 +69,6 @@ class OUICache:
 
         for oui_type, key_len in key_length_map.items():
             inner_dict: Dict[str, str] = self.oui_dict.get(oui_type)
-            if inner_dict is None:
-                continue
             result = inner_dict.get(oui[:key_len])
             if result:
                 return {'oui': oui[:key_len], 'vendor': result}

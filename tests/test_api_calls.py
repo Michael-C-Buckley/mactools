@@ -14,6 +14,7 @@ from mactools.oui_cache.oui_api_calls import (
     vendor_oui_lookup,
 )
 
+from tests.test_oui_cache import MAL_RESPONSE_TEXT
 from tests.test_common import (
     TEST_RECORD,
     MAC48,
@@ -69,11 +70,12 @@ class APITests(TestCase):
                 test_response = httpx_get('https://www.google.com')
     
     # ADD CSV TESTS
-    # @prepare_mock
-    # def test_get_oui_text(self, mock_response: Mock):
-    #     with patch(f'{API_DIR}.httpx_get', return_value=mock_response):
-    #         test_response = get_oui_text()
-    #         self.assertEqual(test_response, mock_response)
+    @prepare_mock
+    def test_get_oui_text(self, mock_response: Mock):
+        with patch(f'{API_DIR}.httpx_get', return_value=mock_response):
+            mock_response.text = MAL_RESPONSE_TEXT
+            test_response = get_oui_csv()
+            self.assertEqual(test_response, mock_response)
 
     @prepare_mock
     def test_mac_lookup_call(self, mock_response: Mock):
