@@ -32,7 +32,7 @@ from mactools.oui_cache.oui_core import (
 
 # Fixed Test Data
 MAL_RESPONSE_TEXT = 'HEADER\r\nMA-L,246D5E,"TEST Systems, Inc",1001 Someplace Road City AA 11111 US'
-MAM_RESPONSE_TEXT = 'HEADER\r\nMA-M,76B74DA,TEST Labs,1001 Someplace Road City AA 11111 US'
+MAM_RESPONSE_TEXT = 'HEADER\r\nMA-M,79B74DA,TEST Labs,1001 Someplace Road City AA 11111 US'
 MAS_RESPONSE_TEXT = 'HEADER\r\nMA-S,24B7BD603,Micro TEST Inc,1001 Someplace Road City AA 11111 US'
 
 def determine_api_response(*args, **kwargs):
@@ -165,6 +165,13 @@ class TestOUICacheRecords(TestCase):
         for test_case in TEST_VENDOR:
             test_get = get_oui_vendor(TEST_OUI_STRING[test_case])
             self.assertEqual(test_get, TEST_VENDOR[test_case])
+
+    def test_locally_administered(self):
+        """
+        Test for locally administered MAC address identification
+        """
+        test_result = get_oui_vendor('4EAAAA')
+        self.assertEqual(test_result, 'Locally administered')
 
     def test_get_record_list(self):
         """

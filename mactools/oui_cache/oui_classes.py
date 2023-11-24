@@ -10,6 +10,7 @@ from typing import Dict
 
 # Local Modules
 from mactools.mac_common import prepare_oui
+from mactools.basemac import BaseMac
 
 from mactools.oui_cache.oui_common import (
     CACHE_DIR,
@@ -45,7 +46,13 @@ class OUICache:
         """
         oui = prepare_oui(input_mac)
 
+        def check_locally_administered(input_mac: str):
+            # Identify a locally administered MAC via U/L of the first byte
+            if bin(int(input_mac[:2], 16))[2:].zfill(8)[6] == '1':
+                return {'oui': input_mac, 'vendor': 'Locally administered'}
+
         def check_range(input_mac: str):
+            # Check MACs within a set range
             for mac_criteria, info in mac_ranges.items():
                 if search(mac_criteria, input_mac):
                     return {'oui': input_mac, 'vendor': info}
@@ -54,6 +61,7 @@ class OUICache:
             specific_macs.get: oui,
             fixed_ouis.get: oui[:6],
             check_range: oui,
+            check_locally_administered: oui,
         }
 
         for func, input_mac in func_dict.items():

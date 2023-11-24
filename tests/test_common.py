@@ -15,7 +15,7 @@ from mactools.oui_cache.oui_classes import OUICache, OUIType
 
 TEST_OUI_STRING = {
     OUIType.OUI: '246D5E',
-    OUIType.OUI28: '76B74DA',
+    OUIType.OUI28: '79B74DA',
     OUIType.OUI36: '24B7BD603',
 }
 TEST_VENDOR = {
