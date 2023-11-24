@@ -20,6 +20,7 @@ fixed_ouis: dict[str, str] = {
 }
 
 specific_macs: dict[str, str] = {
+    'FFFFFFFFFFFF': 'Broadcast',
     '0180C200000E': 'Link Layer Discovery Protocol (LLDP)',
     '01000CCCCCAB': 'Cisco UniDirectional Link Detection (UDLD)',
     '01000CCCCCCC': 'Cisco CDP/VTP/DTP',

@@ -55,17 +55,16 @@ class TestMACCommon(TestCase):
         """
         Tests for the various cases of `prepare_oui`
         """
-        # These OUIs are from the pre-defined sample MACs used in testing
-        test_48_oui = '6026AA'
-        test_64_oui = '0011AA'
+        # This OUI is from the pre-defined sample MACs used in testing
+        test_oui = '246D5E'
 
         for test_case_48 in [MAC48, SAMPLE_EUI48.mac]:
             result = prepare_oui(test_case_48)
-            self.assertEqual(result, test_48_oui)
+            self.assertEqual(result, test_oui)
         
         for test_case_64 in [MAC64, SAMPLE_EUI64.mac]:
             result = prepare_oui(test_case_64)
-            self.assertEqual(result, test_64_oui)
+            self.assertEqual(result, test_oui)
 
         with self.assertRaises(ValueError):
             prepare_oui(100)

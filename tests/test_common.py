@@ -2,34 +2,35 @@
 
 # Python Modules
 from dataclasses import dataclass
+from json import dumps
 from re import search, compile, Match
 from typing import Any
 from unittest import TestCase
+from unittest.mock import Mock
 
 # Local Modules
 from mactools import MacAddress
 
-from mactools.oui_cache.oui_classes import (
-    OUICache,
-    OUIRecord
-)
+from mactools.oui_cache.oui_classes import OUICache, OUIType
 
-TEST_IEEE_DATA = {
-    'oui': '6026AA',
-    'vendor': 'Cisco Systems, Inc',        
-    'hex_oui': '60-26-AA',
-    'street_address': '80 West Tasman Drive',
-    'city': 'San Jose',
-    'state': 'CA',
-    'postal_code': '94568',
-    'country': 'US'
+TEST_OUI_STRING = {
+    OUIType.OUI: '246D5E',
+    OUIType.OUI28: '76B74DA',
+    OUIType.OUI36: '24B7BD603',
 }
-
-TEST_OUI_STRING = '6026aa'
-TEST_RECORD = OUIRecord(**TEST_IEEE_DATA)
-TEST_CACHE = OUICache({TEST_OUI_STRING.upper(): TEST_RECORD})
+TEST_VENDOR = {
+    OUIType.OUI: 'TEST Systems, Inc',
+    OUIType.OUI28: 'TEST Labs',
+    OUIType.OUI36: 'Micro TEST Inc',
+}
+TEST_RECORD = {
+    'oui': TEST_OUI_STRING[OUIType.OUI],
+    'vendor': TEST_VENDOR[OUIType.OUI]
+}
+TEST_CACHE = OUICache({i: {TEST_OUI_STRING[i]: TEST_VENDOR[i]} for i in TEST_VENDOR})
 
 OUI_CORE_PATH = 'mactools.oui_cache.oui_core'
+OUI_API_PATH = 'mactools.oui_cache.oui_api_calls'
 OUI_CLASSES_PATH = 'mactools.oui_cache.oui_classes'
 
 @dataclass
@@ -40,17 +41,29 @@ class TestMac:
 
 
 # Fixed, Reusable Test Cases
-SAMPLE_EUI48 = TestMac('60:26:AA:BB:99:CC',
-    11000000010011010101010101110111001100111001100,
-    105719189445068)
+SAMPLE_EUI48 = TestMac('24:6D:5E:BB:99:CC',
+    1001000110110101011110101110111001100111001100,
+    40052159388108)
 
-SAMPLE_EUI64 = TestMac('00:11:AA:00:00:BB:99:DD',
-    10001101010100000000000000000101110111001100111011101,
-    4971991593097693)
+SAMPLE_EUI64 = TestMac('24:6D:5E:00:00:BB:99:DD',
+    10010001101101010111100000000000000000101110111001100111011101,
+    2624857511932172765)
 
 MAC48 = MacAddress(SAMPLE_EUI48.mac)
 MAC64 = MacAddress(SAMPLE_EUI64.mac)
 
+def prepare_mock(status_code: int = 200):
+    """
+    Decorator to yield a new, local `Mock` for HTTP responses
+    """
+    def inner_decorator(func: callable, *args) -> callable:
+        def wrapper(self, *args):
+            mock_response: Mock = Mock()
+            mock_response.status_code = status_code
+            mock_response.text = dumps(TEST_RECORD)
+            return func(self, mock_response, *args)
+        return wrapper
+    return inner_decorator
 
 def test_regex_comparison(test_obj: TestCase, pattern: str, test_func: callable,
         test_samples: int, test_arg: Any = None):

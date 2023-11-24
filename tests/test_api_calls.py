@@ -1,20 +1,25 @@
+# MacTools API tests
+
+# Python Modules
+from json import dumps
+from unittest import TestCase, main
+from unittest.mock import Mock, patch
+
+# Local Modules
+
 from mactools.oui_cache.oui_api_calls import (
     httpx_get,
-    get_oui_text,
+    get_oui_csv,
     mac_lookup_call,
     vendor_oui_lookup,
 )
 
 from tests.test_common import (
-    TEST_IEEE_DATA,
+    TEST_RECORD,
     MAC48,
     SAMPLE_EUI48
 )
 
-from mactools.oui_cache.oui_classes import OUIRecord
-
-from unittest import TestCase, main
-from unittest.mock import Mock, patch
 
 API_DIR = 'mactools.oui_cache.oui_api_calls'
 
@@ -27,8 +32,8 @@ class APITests(TestCase):
     def setUpClass(cls) -> None:
         cls.test_mac = MAC48
         cls.test_mac_str = SAMPLE_EUI48.mac
-        cls.test_oui = TEST_IEEE_DATA.get('oui')
-        cls.test_vendor = TEST_IEEE_DATA.get('vendor')
+        cls.test_oui = TEST_RECORD.get('oui')
+        cls.test_vendor = TEST_RECORD.get('vendor')
 
     def prepare_mock(func: callable, *args) -> callable:
         """
@@ -37,12 +42,13 @@ class APITests(TestCase):
         def wrapper(self, *args):
             mock_response: Mock = Mock()
             mock_response.status_code = 200
+            mock_response.text = dumps(TEST_RECORD)
             return func(self, mock_response, *args)
         return wrapper
     
     def multi_test_cases(self, func: callable, expected_result, *args) -> None:
         """
-        
+        Test factory for conducting multiple tests of a function
         """
         for test_input in [self.test_mac, self.test_mac_str]:
             result = func(test_input)
@@ -62,22 +68,17 @@ class APITests(TestCase):
             with self.assertRaises(Exception):
                 test_response = httpx_get('https://www.google.com')
     
-    @prepare_mock
-    def test_get_oui_text(self, mock_response: Mock):
-        with patch(f'{API_DIR}.httpx_get', return_value=mock_response):
-            test_response = get_oui_text()
-            self.assertEqual(test_response, mock_response)
+    # ADD CSV TESTS
+    # @prepare_mock
+    # def test_get_oui_text(self, mock_response: Mock):
+    #     with patch(f'{API_DIR}.httpx_get', return_value=mock_response):
+    #         test_response = get_oui_text()
+    #         self.assertEqual(test_response, mock_response)
 
     @prepare_mock
     def test_mac_lookup_call(self, mock_response: Mock):
-        
-        # The JSON-schema text response has a few particulars about construction
-        mock_response.text = '{' + f'"macPrefix":"{self.test_oui}","company":"{self.test_vendor}"' + '}'
-
-        expected_result = OUIRecord(self.test_oui, self.test_vendor)
-
         with patch(f'{API_DIR}.httpx_get', return_value=mock_response):
-            self.multi_test_cases(mac_lookup_call, expected_result)
+            self.multi_test_cases(mac_lookup_call, TEST_RECORD)
 
     @prepare_mock
     def test_vendor_oui_lookup(self, mock_response: Mock):

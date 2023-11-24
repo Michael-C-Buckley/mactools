@@ -1,14 +1,14 @@
 # MacTools Base MAC Address Class
 
+# Python Modules
 from __future__ import annotations
 from enum import Enum
+from functools import cached_property
 from re import compile, search
 from typing import Dict, Optional, Union, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from mactools.oui_cache.oui_core import OUICache
-
-from functools import cached_property
 
 class MacNotation(Enum):
     CLEAN = ''
@@ -70,7 +70,7 @@ class BaseMac:
         """
         Returns the shifted MAC when adding a number
         """
-        return self.number_to_hex_mac(self.decimal + value, self.format)
+        return self.number_to_hex_mac(self.decimal + value, self.format, self.__eui)
 
     def __sub__(self, value: Union[int, 'BaseMac']):
         """
@@ -79,7 +79,7 @@ class BaseMac:
         """
         if isinstance(value, BaseMac):
             return self.decimal - value.decimal
-        return self.number_to_hex_mac(self.decimal - value, self.format)
+        return self.number_to_hex_mac(self.decimal - value, self.format, self.__eui)
 
     @classmethod
     def validate_mac(cls, mac_input: Union[str, int]) -> int:
@@ -113,7 +113,7 @@ class BaseMac:
         Returns the vendor if the IEEE lookup was made
         """
         if self.__oui_record:
-            return next(iter(self.__oui_record.values()))
+            return self.__oui_record.get('vendor')
         
     @cached_property
     def clean_oui(self) -> str:
