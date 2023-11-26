@@ -45,7 +45,7 @@ decimal, binary
 
 ### OUICache
 
-Local cache of the IEEE OUI MA-L registry for quick look-ups without needing to
+Local cache of the IEEE OUI MA-L, MA-M, and MA-S registries for quick look-ups without needing to
 consistently hit API endpoints for individual queries.
 
 `MacAddress` currently automatically performs the look-up on creation.
@@ -53,7 +53,7 @@ consistently hit API endpoints for individual queries.
 The full information is available, including OUI, Vendor, Address, etc.
 
 The cache also contains specific references to commonly defined non-vendor OUIs
-such as Multicast, IEEE protocols (STP, LLDP, etc), and others.
+such as Multicast, IEEE protocols (STP, LLDP, etc), Locally administered and others.
 
 #### Usage
 
