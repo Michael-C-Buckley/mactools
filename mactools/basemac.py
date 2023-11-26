@@ -31,7 +31,7 @@ class BaseMac:
     Wrapper and handler for MAC Addresses
     """
     def __init__(self, mac: Union[str, int], format: MacNotation = MacNotation.COLON,
-                 oui_cache: 'OUICache' = None):
+                 oui_cache: 'OUICache' = None, *args, **kwargs):
         
         eui = self.validate_mac(mac)
         if not eui:
