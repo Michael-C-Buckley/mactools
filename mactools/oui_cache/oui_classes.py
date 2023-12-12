@@ -1,16 +1,16 @@
 # OUI Cache Classes
 
 # Python Modules
+from aiofiles import open as aio_open
 from datetime import datetime
 from enum import Enum
 from os import makedirs
-from pickle import dump
+from pickle import dump, dumps
 from re import search
 from typing import Dict
 
 # Local Modules
 from mactools.mac_common import prepare_oui
-from mactools.basemac import BaseMac
 
 from mactools.oui_cache.oui_common import (
     CACHE_DIR,
@@ -33,12 +33,26 @@ class OUIType(Enum):
 
 class OUICache:
     """
-    Object for holding the OUI Cache
+    Singleton for holding the OUI Cache
     """
-    def __init__(self, oui_dict: Dict[OUIType, Dict[str, str]]) -> None:
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._initialized = False
+        return cls._instance
+
+    def __init__(self, oui_dict: Dict[OUIType, Dict[str, str]] = None) -> None:
+        if self._initialized:
+            return
         self.version: str = VERSION
         self.timestamp: datetime = datetime.now()
         self.oui_dict: Dict[OUIType, Dict[str, str]] = oui_dict
+        self._initialized = True
+
+    def __repr__(self) -> str:
+        return 'MacTools OUI Cache'
 
     def get_record(self, input_mac: str) -> Dict[str, str]:
         """
@@ -89,11 +103,19 @@ class OUICache:
         if record_dict:
             return record_dict.get('vendor')
         
-    # File handling
     def write_oui_cache(self) -> None:
         """
-        Writes `OUICache` object to the user's cache directory
+        Write of `OUICache` object to the user's cache directory
         """
         makedirs(CACHE_DIR, exist_ok=True)
         with open(PICKLE_DIR, 'wb') as file:
-            dump(self, file)
+            dump(file)
+        
+    async def aio_write_oui_cache(self) -> None:
+        """
+        Async write of `OUICache` object to the user's cache directory
+        """
+        makedirs(CACHE_DIR, exist_ok=True)
+        async with aio_open(PICKLE_DIR, 'wb') as file:
+            data = dumps(self)
+            await file.write(data)
