@@ -27,12 +27,21 @@ class OUIType(Enum):
 
 class OUICache:
     """
-    Object for holding the OUI Cache
+    Singleton for holding the OUI Cache
     """
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._initialized = False
+        return cls._instance
+    
     def __init__(self, oui_dict: Dict[OUIType, Dict[str, str]]) -> None:
         self.version: str = VERSION
         self.timestamp: datetime = datetime.now()
         self.oui_dict: Dict[OUIType, Dict[str, str]] = oui_dict
+        self._initialized = True
 
     def get_record(self, input_mac: str) -> Dict[str, str]:
         """
