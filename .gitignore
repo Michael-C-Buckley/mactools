@@ -4,6 +4,7 @@ mactools/resources/*
 logs/
 **/__pycache__/
 test.py
+scrap.py
 
 # Template added
 # Editors
