@@ -59,11 +59,11 @@ class TestMACCommon(TestCase):
         test_oui = '246D5E'
 
         for test_case_48 in [MAC48, SAMPLE_EUI48.mac]:
-            result = prepare_oui(test_case_48)
+            result = prepare_oui(test_case_48, False)
             self.assertEqual(result, test_oui)
         
         for test_case_64 in [MAC64, SAMPLE_EUI64.mac]:
-            result = prepare_oui(test_case_64)
+            result = prepare_oui(test_case_64, False)
             self.assertEqual(result, test_oui)
 
         with self.assertRaises(ValueError):

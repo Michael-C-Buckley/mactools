@@ -29,8 +29,8 @@ def get_oui_cache() -> OUICache:
     """
     Gets the IEEE OUI info, creates, and pickles the cache
     """
-
-    # SINGLETON RETURN FIRST
+    if OUICache._instance is not None:
+        return OUICache._instance
 
     with Executor(max_workers=3) as executor:
         base_path = resource_filename('mactools', 'resources/ieee')
@@ -45,7 +45,7 @@ def get_oui_cache() -> OUICache:
 
 def get_oui_vendor(input_item: Union[str, list[str]]) -> Optional[Union[str, list[str]]]:
     """
-    Inner function for `get_oui_vendor` and `get_oui_record`
+    Gets the vendor names of the passed string or list of strings
     """
     oui_cache = get_oui_cache()
     if isinstance(input_item, str):

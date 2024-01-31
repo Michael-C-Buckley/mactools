@@ -24,17 +24,6 @@ TEST_VENDOR = {
     OUIType.OUI36: 'Micro TEST Inc',
 }
 
-# Real Sample OUIs from the IEEE Data
-TEST_REAL_OUI_STRING = {
-    OUIType.OUI: '6026AA',
-    OUIType.OUI28: 'C022F15',
-    OUIType.OUI36: '8C1F64061',
-}
-TEST_REAL_VENDOR = {
-    OUIType.OUI: 'Cisco Systems, Inc',
-    OUIType.OUI28: 'Canon Electronic Business Machines (H.K.) Co., Ltd.',
-    OUIType.OUI36: 'Micron Systems',
-}
 TEST_RECORD = {
     'oui': TEST_OUI_STRING[OUIType.OUI],
     'vendor': TEST_VENDOR[OUIType.OUI]

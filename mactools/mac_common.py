@@ -38,24 +38,24 @@ def hex_range(varying_chars: int, fixed_start: str = '', fixed_end: str = '') ->
         fill_part = fill_hex(i, varying_chars)
         yield f'{fixed_start}{fill_part}{fixed_end}'
 
-def prepare_oui(input_mac: Union[BaseMac, str, int]) -> str:
+def prepare_oui(input_mac: Union[BaseMac, str, int], full: bool = True) -> str:
         """
         Takes a MAC or OUI and strips and prepares a unified clean OUI
         """
         if isinstance(input_mac, (int, str)):
             try:
-                oui = BaseMac(input_mac).clean_oui
+                mac = BaseMac(input_mac).clean
             except ValueError:
                 if isinstance(input_mac, str):
-                    oui = BaseMac.clean_mac_address(input_mac)
+                    mac = BaseMac.clean_mac_address(input_mac)
                 else:
-                    oui = BaseMac.number_to_hex_mac(input_mac, MacNotation.CLEAN)
-                if not search(r'[A-F\d]{6,16}', oui):
+                    mac = BaseMac.number_to_hex_mac(input_mac, MacNotation.CLEAN)
+                if not search(r'[A-F\d]{6,16}', mac):
                     raise ValueError(f'{input_mac} is not a valid MAC address or OUI')
         else:
-            oui = input_mac.clean_oui
+            return input_mac.clean_oui
 
-        return oui
+        return mac if full else mac[:6]
 
 # Create Random MAC or Hex
 

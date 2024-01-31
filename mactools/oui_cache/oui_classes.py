@@ -69,8 +69,10 @@ class OUICache:
 
         for func, input_mac in func_dict.items():
             result = func(input_mac)
-            if result:
+            if isinstance(result, dict):
                 return result
+            elif isinstance(result, str):
+                return {'oui': oui, 'vendor': result}
 
         key_length_map = {
             OUIType.OUI36: 9,
