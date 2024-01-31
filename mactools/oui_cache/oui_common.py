@@ -1,15 +1,5 @@
-# Python Modules
-from os import path
-
-# Third Party Modules
-from appdirs import user_data_dir
-
 # Common Re-used Imports
 from mactools import __version__ as VERSION
-
-# Cache file constants
-CACHE_DIR = user_data_dir()
-PICKLE_DIR = path.join(CACHE_DIR, 'oui.pkl')
 
 fixed_ouis: dict[str, str] = {
     'FFFFFF': 'Broadcast',

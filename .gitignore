@@ -1,6 +1,6 @@
-# Switch Magic Gitignore
+# MacTools Gitignore
 
-Output/
+mactools/resources/*
 logs/
 **/__pycache__/
 test.py

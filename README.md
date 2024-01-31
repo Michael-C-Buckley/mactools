@@ -73,11 +73,10 @@ oui = '01000C'
 
 # These methods would also work with the `mac` defined above as well 
 vendor = cache.get_vendor(oui)
-record = cache.get_record(oui)
 ```
 
-`vendor` will be the string of vendor registered to IEEE where `record` will be
-an `OUIRecord` which includes all the information from IEEE.
+`vendor` will be the string of vendor registered to IEEE.
+It will also identify common protocol MACs (such as Spanning Tree, Cisco/Extreme, etc.) and randomized MACs (locally administered).
 
 ## License
 

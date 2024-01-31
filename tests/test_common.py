@@ -10,9 +10,9 @@ from unittest.mock import Mock
 
 # Local Modules
 from mactools import MacAddress
-
 from mactools.oui_cache.oui_classes import OUICache, OUIType
 
+# Fake MACs for internal testing
 TEST_OUI_STRING = {
     OUIType.OUI: '246D5E',
     OUIType.OUI28: '79B74DA',
@@ -22,6 +22,18 @@ TEST_VENDOR = {
     OUIType.OUI: 'TEST Systems, Inc',
     OUIType.OUI28: 'TEST Labs',
     OUIType.OUI36: 'Micro TEST Inc',
+}
+
+# Real Sample OUIs from the IEEE Data
+TEST_REAL_OUI_STRING = {
+    OUIType.OUI: '6026AA',
+    OUIType.OUI28: 'C022F15',
+    OUIType.OUI36: '8C1F64061',
+}
+TEST_REAL_VENDOR = {
+    OUIType.OUI: 'Cisco Systems, Inc',
+    OUIType.OUI28: 'Canon Electronic Business Machines (H.K.) Co., Ltd.',
+    OUIType.OUI36: 'Micron Systems',
 }
 TEST_RECORD = {
     'oui': TEST_OUI_STRING[OUIType.OUI],

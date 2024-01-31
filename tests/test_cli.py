@@ -5,7 +5,7 @@ from re import search
 from sys import executable
 from subprocess import run
 from unittest import TestCase, main
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 # Local Modules
 from tests.test_common import TEST_CACHE,TEST_OUI_STRING, TEST_VENDOR

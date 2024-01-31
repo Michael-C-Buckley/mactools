@@ -4,7 +4,6 @@
 from re import match, Pattern
 from typing import Optional
 from unittest import TestCase, main
-from unittest.mock import patch
 
 # Local Modules
 from tests.test_common import (

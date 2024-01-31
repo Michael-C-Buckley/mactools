@@ -3,24 +3,18 @@
 # Python Modules
 from datetime import datetime
 from enum import Enum
-from os import makedirs
-from pickle import dump
 from re import search
 from typing import Dict
 
 # Local Modules
 from mactools.mac_common import prepare_oui
-from mactools.basemac import BaseMac
 
 from mactools.oui_cache.oui_common import (
-    CACHE_DIR,
-    PICKLE_DIR,
     VERSION,
     fixed_ouis,
     specific_macs,
     mac_ranges
 )
-
 
 class OUIType(Enum):
     """
@@ -89,11 +83,3 @@ class OUICache:
         if record_dict:
             return record_dict.get('vendor')
         
-    # File handling
-    def write_oui_cache(self) -> None:
-        """
-        Writes `OUICache` object to the user's cache directory
-        """
-        makedirs(CACHE_DIR, exist_ok=True)
-        with open(PICKLE_DIR, 'wb') as file:
-            dump(self, file)
