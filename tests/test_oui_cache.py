@@ -2,7 +2,7 @@
 
 # Python Modules
 from unittest import TestCase, main
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 from re import search
 from typing import TYPE_CHECKING
 
@@ -10,16 +10,13 @@ if TYPE_CHECKING:
     from unittest.mock import _patch_default_new
 
 # Local modules
-from mactools.oui_cache.oui_classes import OUIType
 from mactools.oui_cache.oui_core import (
     get_oui_cache,
     get_oui_vendor,
 )
 from tests.test_common import (
     OUICache,
-    OUI_CORE_PATH,
     TEST_OUI_STRING,
-    TEST_RECORD,
     TEST_VENDOR,
 )
 

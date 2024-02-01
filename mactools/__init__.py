@@ -18,3 +18,5 @@ from mactools.mac_common import (
     create_random_hex_string,
     create_random_mac
 )
+
+from mactools.update_ieee import update_ieee_files
