@@ -11,8 +11,8 @@ from mactools import __version__, update_ieee_files
 
 class CustomInstall(install):
     def run(self):
+        update_ieee_files(overwrite=False)
         install.run(self)
-        update_ieee_files()
 
 # Normal Install
 
@@ -32,5 +32,8 @@ setup(
         'install': CustomInstall,
     },
     packages=find_packages(),
+    package_data={
+        'my_package': ['resources/ieee/*.csv'],
+    },
     keywords=['python','networking','network','mac','oui','ieee']
 )

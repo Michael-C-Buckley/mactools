@@ -9,6 +9,7 @@ from typing import Dict, Optional, Union
 
 # Local Modules
 from mactools.oui_cache.oui_classes import OUICache, OUIType
+from mactools.update_ieee import update_ieee_files
 
 def process_ieee_csv(file_path: str) -> Dict[OUIType, Dict[str, str]]:
     """
@@ -32,10 +33,15 @@ def get_oui_cache() -> OUICache:
     if OUICache._instance is not None:
         return OUICache._instance
 
+    base_path = resource_filename('mactools', 'resources/ieee')
+    file_paths = [path.join(base_path, f'{i}.csv') for i in ['oui36', 'mam', 'oui']]
+    for file_path in file_paths:
+        if not path.exists(file_path):
+            update_ieee_files()
+            break
+
     with Executor(max_workers=3) as executor:
-        base_path = resource_filename('mactools', 'resources/ieee')
-        paths = [path.join(base_path, f'{i}.csv') for i in ['oui36', 'mam', 'oui']]
-        oui_dicts = executor.map(process_ieee_csv, paths)
+        oui_dicts = executor.map(process_ieee_csv, file_paths)
 
     final_dict = {}
     for oui_dict in oui_dicts:
