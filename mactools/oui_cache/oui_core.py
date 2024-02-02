@@ -15,7 +15,7 @@ def process_ieee_csv(file_path: str) -> Dict[OUIType, Dict[str, str]]:
     """
     Converts the IEEE CSV response into a Python dictionary
     """
-    with open(file_path) as file:
+    with open(file_path, encoding='utf-8') as file:
         csv = reader(file)
         next(csv)
 

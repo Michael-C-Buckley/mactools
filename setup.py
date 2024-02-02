@@ -33,7 +33,7 @@ setup(
     },
     packages=find_packages(),
     package_data={
-        'my_package': ['resources/ieee/*.csv'],
+        'mactools': ['resources/ieee/*.csv'],
     },
     keywords=['python','networking','network','mac','oui','ieee']
 )
