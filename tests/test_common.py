@@ -31,7 +31,6 @@ TEST_RECORD = {
 TEST_CACHE = OUICache({i: {TEST_OUI_STRING[i]: TEST_VENDOR[i]} for i in TEST_VENDOR})
 
 OUI_CORE_PATH = 'mactools.oui_cache.oui_core'
-OUI_API_PATH = 'mactools.oui_cache.oui_api_calls'
 OUI_CLASSES_PATH = 'mactools.oui_cache.oui_classes'
 
 @dataclass

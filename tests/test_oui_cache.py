@@ -2,8 +2,7 @@
 
 # Python Modules
 from unittest import TestCase, main
-from unittest.mock import patch
-from re import search
+from unittest.mock import Mock, patch, DEFAULT
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -16,6 +15,7 @@ from mactools.oui_cache.oui_core import (
 )
 from tests.test_common import (
     OUICache,
+    OUI_CORE_PATH,
     TEST_OUI_STRING,
     TEST_VENDOR,
 )
@@ -46,6 +46,17 @@ class TestOUICache(TestCase):
         
         second_cache = get_oui_cache()
         self.assertEqual(local_cache, second_cache)
+
+    @patch(f'os.path.exists')
+    @patch.multiple(OUI_CORE_PATH, update_ieee_files=DEFAULT, process_ieee_csv=DEFAULT)
+    def test_cache_with_updates(self, path_exists: Mock, update_ieee_files: Mock, process_ieee_csv: Mock):
+        path_exists.return_value = False
+        update_ieee_files.return_value = True
+        process_ieee_csv.side_effect = Exception('Test Interrupt')
+        
+        with self.assertRaises(Exception):
+            get_oui_cache(regenerate=True)
+            update_ieee_files.assert_called_once()
 
     def test_get_vendor(self):
         """

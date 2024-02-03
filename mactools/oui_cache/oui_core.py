@@ -26,11 +26,11 @@ def process_ieee_csv(file_path: str) -> Dict[OUIType, Dict[str, str]]:
 
     return {OUIType(assignment_type): entries}
 
-def get_oui_cache() -> OUICache:
+def get_oui_cache(regenerate: bool = False) -> OUICache:
     """
     Gets the IEEE OUI info, creates, and pickles the cache
     """
-    if OUICache._instance is not None:
+    if OUICache._instance is not None and not regenerate:
         return OUICache._instance
 
     base_path = resource_filename('mactools', 'resources/ieee')

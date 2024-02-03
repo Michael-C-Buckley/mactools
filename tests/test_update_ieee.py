@@ -48,5 +48,12 @@ class TestUpdate(TestCase):
         test_result = update_ieee_files()
         self.assertEqual(test_result, False)
 
+    @patch('mactools.update_ieee.path')
+    def test_skip_updating_file(self, mock_path: Mock):
+        mock_path.return_value = True
+        test_result = update_ieee_files(overwrite=False)
+        self.assertEqual(test_result, True)
+    
+
 if __name__ == '__main__':
     main()

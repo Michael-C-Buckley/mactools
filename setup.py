@@ -11,7 +11,7 @@ from mactools import __version__, update_ieee_files
 
 class CustomInstall(install):
     def run(self):
-        update_ieee_files(overwrite=False)
+        update_ieee_files(overwrite=True)
         install.run(self)
 
 # Normal Install
