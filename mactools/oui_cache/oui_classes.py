@@ -8,6 +8,7 @@ from typing import Dict
 
 # Local Modules
 from mactools.mac_common import prepare_oui
+from mactools.tools_common import get_hex_value
 
 from mactools.oui_cache.oui_common import (
     VERSION,
@@ -49,6 +50,14 @@ class OUICache:
         """
         oui = prepare_oui(input_mac)
 
+        hex_value = get_hex_value(oui)
+        if hex_value == -1:
+            return {'input': input_mac, 'error': 'invalid', 'note': 'This is not a valid hex string'}
+        if hex_value < 24:
+            return {'input': input_mac, 'error': 'invalid', 'note': 'OUI/MAC is shorter than 6 hex characters (24 bits) and too short to be any OUI'}
+        if hex_value > 64:
+            return {'input': input_mac, 'error': 'invalid', 'note': 'OUI/MAC is longer than 16 hex characters (64 bits) and longer than MAC addresses can be'}
+
         def check_locally_administered(input_mac: str):
             # Identify a locally administered MAC via U/L of the first byte
             if bin(int(input_mac[:2], 16))[2:].zfill(8)[6] == '1':
@@ -85,6 +94,9 @@ class OUICache:
             result = inner_dict.get(oui[:key_len])
             if result:
                 return {'oui': oui[:key_len], 'vendor': result}
+            
+        # Fall-through case for valid OUI without any registration
+        return {'oui': oui, 'vendor': 'Unregistered', 'note': 'This OUI is valid but has no associated registration in the IEEE global registry (MA-L, MA-M, or MA-S)'}
             
     def get_vendor(self, input_mac: str) -> str:
         """

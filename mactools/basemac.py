@@ -4,8 +4,11 @@
 from __future__ import annotations
 from enum import Enum
 from functools import cached_property
-from re import compile, search
+from re import search
 from typing import Dict, Optional, Union, TYPE_CHECKING
+
+# Local Modules
+from mactools.tools_common import get_hex_value
 
 if TYPE_CHECKING:
     from mactools.oui_cache.oui_core import OUICache
@@ -16,15 +19,6 @@ class MacNotation(Enum):
     PERIOD = '.'
     HYPHEN = '-'
     SPACE = ' '
-
-HEX_PATTERN = r'[a-fA-F0-9]'
-HEX_PAIR = f'{HEX_PATTERN}{{2}}'
-MAC_PORTION = fr'{HEX_PAIR}[:\-\. ]?'
-EUI48_PATTERN = f'({MAC_PORTION}){{5}}{HEX_PAIR}'
-EUI64_PATTERN = f'({MAC_PORTION}){{7}}{HEX_PAIR}'
-MAC_PATTERN = f'{EUI48_PATTERN}|{EUI64_PATTERN}'
-EUI48_REGEX = compile(EUI48_PATTERN)
-EUI64_REGEX = compile(EUI64_PATTERN)
 
 class BaseMac:
     """
@@ -84,26 +78,13 @@ class BaseMac:
     @classmethod
     def validate_mac(cls, mac_input: Union[str, int]) -> int:
         """
-        Validates a string and returns `bool` for the results and `int` for the
-        EUI if it passes
+        Validates a string and returns the EUI value for valid matches or 0 for invalid
         """
         if isinstance(mac_input, int):
             mac_input = BaseMac.number_to_hex_mac(mac_input)
-        
-        mac_candidate = mac_input.strip()
 
-        match_case = {
-            EUI64_REGEX: 64,
-            EUI48_REGEX: 48
-        }
-
-        for regex, value in match_case.items():
-            mac_match = search(regex, mac_candidate)
-            if mac_match:
-                return value
-            
-        # Returns type `int` but implicit `False`
-        return 0
+        hex_value = get_hex_value(mac_input)
+        return hex_value if hex_value in [48, 64] else 0
 
     # PROPERTIES
 

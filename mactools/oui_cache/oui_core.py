@@ -58,10 +58,11 @@ def get_oui_vendor(input_item: Union[str, list[str]]) -> Optional[Union[str, lis
         return oui_cache.get_vendor(input_item.upper())
     elif isinstance(input_item, list):
         result = []
-        for item in input_item:
+        for i, item in enumerate(input_item):
             if isinstance(item, str):
                 result.append(oui_cache.get_vendor(item.upper()))
             else:
-                raise ValueError('The input list must be strings')
+                raise ValueError(f'The input list must be strings. Item {i} was {type(item)}.')
         return result
-    raise ValueError('Input must be either a string or list of strings')
+    else:
+        raise ValueError('Input must be either a string or list of strings')

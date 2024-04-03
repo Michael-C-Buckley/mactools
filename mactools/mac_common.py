@@ -4,6 +4,7 @@
 from random import randint
 from typing import Union
 from re import search
+from typing import Iterator
 
 # Local Modules
 from mactools.basemac import BaseMac, MacNotation
@@ -28,7 +29,7 @@ def fill_hex(raw_input: Union[str, int], required_length: int, backfill: bool = 
 
     return output_dict.get(backfill)
 
-def hex_range(varying_chars: int, fixed_start: str = '', fixed_end: str = '') -> str:
+def hex_range(varying_chars: int, fixed_start: str = '', fixed_end: str = '') -> Iterator[str]:
     """
     Returns a generator which iterates creates a range of hex.
     `fixed_start` and `fixed_end` are the leading and trailing fixed portions.

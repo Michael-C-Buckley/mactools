@@ -21,7 +21,7 @@ from mactools import (
     create_random_mac,
 )
 
-from mactools.basemac import (
+from mactools.tools_common import (
     HEX_PATTERN,
     MAC_PORTION,
     EUI48_REGEX,

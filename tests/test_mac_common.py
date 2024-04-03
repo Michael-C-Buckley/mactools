@@ -4,7 +4,7 @@
 from unittest import TestCase, main
 
 # Local Modules
-from mactools.basemac import MAC_PATTERN
+from mactools.tools_common import MAC_PATTERN
 
 from mactools import (
     fill_hex,

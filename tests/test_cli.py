@@ -45,7 +45,7 @@ class CLITest(TestCase):
             self.assertTrue(output_match)
 
         no_match = oui_cli_main('6026aa')
-        self.assertIsNone(no_match)
+        self.assertEqual(no_match, 'Unregistered')
 
         error = oui_cli_main(101)
         self.assertEqual(error, ValueError)
