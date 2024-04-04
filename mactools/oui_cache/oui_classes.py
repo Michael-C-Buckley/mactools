@@ -93,7 +93,7 @@ class OUICache:
             inner_dict: Dict[str, str] = self.oui_dict.get(oui_type)
             result = inner_dict.get(oui[:key_len])
             if result:
-                return {'oui': oui[:key_len], 'vendor': result}
+                return result
             
         # Fall-through case for valid OUI without any registration
         return {'oui': oui, 'vendor': 'Unregistered', 'note': 'This OUI is valid but has no associated registration in the IEEE global registry (MA-L, MA-M, or MA-S)'}

@@ -22,7 +22,7 @@ def process_ieee_csv(file_path: str) -> Dict[OUIType, Dict[str, str]]:
         entries = {}
         for record in csv:
             assignment_type, oui, vendor, address = record
-            entries[oui] = vendor
+            entries[oui] = {'vendor': vendor, 'oui': oui, 'address': address}
 
     return {OUIType(assignment_type): entries}
 
@@ -49,20 +49,14 @@ def get_oui_cache(regenerate: bool = False) -> OUICache:
 
     return OUICache(final_dict)
 
-def get_oui_vendor(input_item: Union[str, list[str]]) -> Optional[Union[str, list[str]]]:
+def get_oui_record(input_mac: str) -> Optional[dict[str, str]]:
     """
-    Gets the vendor names of the passed string or list of strings
+    Gets the record of a MAC or OUI
     """
-    oui_cache = get_oui_cache()
-    if isinstance(input_item, str):
-        return oui_cache.get_vendor(input_item.upper())
-    elif isinstance(input_item, list):
-        result = []
-        for i, item in enumerate(input_item):
-            if isinstance(item, str):
-                result.append(oui_cache.get_vendor(item.upper()))
-            else:
-                raise ValueError(f'The input list must be strings. Item {i} was {type(item)}.')
-        return result
-    else:
-        raise ValueError('Input must be either a string or list of strings')
+    return get_oui_cache().get_record(input_mac)
+
+def get_oui_vendor(input_mac: str) -> str:
+    """
+    Gets the vendor names of a MAC or OUI
+    """
+    return get_oui_cache().get_vendor(input_mac)

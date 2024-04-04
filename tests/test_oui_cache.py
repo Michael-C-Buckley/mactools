@@ -66,17 +66,6 @@ class TestOUICache(TestCase):
             test_get = get_oui_vendor(TEST_OUI_STRING[test_case])
             self.assertEqual(test_get, TEST_VENDOR[test_case])
 
-    def test_get_vendor_list(self):
-        """
-        Fetching the records of a list of items
-        """
-        test_list = [v for v in TEST_OUI_STRING.values()]
-        result_list = get_oui_vendor(test_list)
-
-        for result, test_case in zip(result_list, TEST_VENDOR.values()):
-            self.assertEqual(result, test_case)
-
-
     def test_locally_administered(self):
         test_result = get_oui_vendor('4EAAAA')
         self.assertEqual(test_result, 'Locally administered')
@@ -93,8 +82,6 @@ class TestOUICache(TestCase):
         """
         Tests for the inner functionality of cache getting
         """
-        with self.assertRaises(ValueError):
-            get_oui_vendor([10])
         with self.assertRaises(ValueError):
             get_oui_vendor(10)
 

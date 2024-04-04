@@ -7,7 +7,8 @@ from mactools.oui_cache.oui_classes import OUICache
 
 from mactools.oui_cache.oui_core import (
     get_oui_cache,
-    get_oui_vendor
+    get_oui_vendor,
+    get_oui_record
 )
 
 from mactools.mac_common import (

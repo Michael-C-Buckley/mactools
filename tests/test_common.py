@@ -26,9 +26,10 @@ TEST_VENDOR = {
 
 TEST_RECORD = {
     'oui': TEST_OUI_STRING[OUIType.OUI],
-    'vendor': TEST_VENDOR[OUIType.OUI]
+    'vendor': TEST_VENDOR[OUIType.OUI],
+    'address': 'ADDRESS INFO'
 }
-TEST_CACHE = OUICache({i: {TEST_OUI_STRING[i]: TEST_VENDOR[i]} for i in TEST_VENDOR})
+TEST_CACHE = OUICache({i: {TEST_OUI_STRING[i]: {'vendor': TEST_VENDOR[i], 'oui': TEST_OUI_STRING[i], 'address': 'ADDRESS INFO'}} for i in TEST_VENDOR})
 
 OUI_CORE_PATH = 'mactools.oui_cache.oui_core'
 OUI_CLASSES_PATH = 'mactools.oui_cache.oui_classes'
