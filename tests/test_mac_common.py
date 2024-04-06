@@ -66,9 +66,6 @@ class TestMACCommon(TestCase):
             result = prepare_oui(test_case_64, False)
             self.assertEqual(result, test_oui)
 
-        with self.assertRaises(ValueError):
-            prepare_oui(100)
-
     def test_create_random_hex_bit(self):
         """
         Test for creating hex bits

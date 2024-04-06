@@ -5,6 +5,7 @@ from re import search, compile as re_compile
 HEX_PATTERN = r'[a-fA-F0-9]'
 HEX_PAIR = f'{HEX_PATTERN}{{2}}'
 MAC_PORTION = fr'{HEX_PAIR}[:\-\. ]?'
+HEX_REGEX = re_compile(HEX_PATTERN)
 
 EUI48_PATTERN = f'(?:{MAC_PORTION}){{5}}{HEX_PAIR}'
 EUI64_PATTERN = f'(?:{MAC_PORTION}){{7}}{HEX_PAIR}'

@@ -3,7 +3,6 @@
 # Python Modules
 from random import randint
 from typing import Union
-from re import search
 from typing import Iterator
 
 # Local Modules
@@ -43,20 +42,14 @@ def prepare_oui(input_mac: Union[BaseMac, str, int], full: bool = True) -> str:
         """
         Takes a MAC or OUI and strips and prepares a unified clean OUI
         """
-        if isinstance(input_mac, (int, str)):
-            try:
-                mac = BaseMac(input_mac).clean
-            except ValueError:
-                if isinstance(input_mac, str):
-                    mac = BaseMac.clean_mac_address(input_mac)
-                else:
-                    mac = BaseMac.number_to_hex_mac(input_mac, MacNotation.CLEAN)
-                if not search(r'[A-F\d]{6,16}', mac):
-                    raise ValueError(f'{input_mac} is not a valid MAC address or OUI')
-        else:
-            return input_mac.clean_oui
+        lookup_key = BaseMac if isinstance(input_mac, BaseMac) else type(input_mac)
+        mac = {
+            str: lambda: BaseMac.clean_mac_address(input_mac),
+            int: lambda: BaseMac.number_to_hex_mac(input_mac, MacNotation.CLEAN),
+            BaseMac: lambda: input_mac.clean,
+        }.get(lookup_key)()
 
-        return mac if full else mac[:6]
+        return mac if full and mac else mac[:6]
 
 # Create Random MAC or Hex
 

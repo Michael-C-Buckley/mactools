@@ -104,5 +104,7 @@ class OUICache:
         """
         record_dict = self.get_record(input_mac)
         if record_dict:
+            if record_dict.get('error'):
+                raise ValueError(record_dict['error'])
             return record_dict.get('vendor')
         

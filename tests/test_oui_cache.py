@@ -11,6 +11,7 @@ if TYPE_CHECKING:
 # Local modules
 from mactools.oui_cache.oui_core import (
     get_oui_cache,
+    get_oui_record,
     get_oui_vendor,
 )
 from tests.test_common import (
@@ -66,6 +67,15 @@ class TestOUICache(TestCase):
             test_get = get_oui_vendor(TEST_OUI_STRING[test_case])
             self.assertEqual(test_get, TEST_VENDOR[test_case])
 
+    def test_get_record(self):
+        """
+        Standard testing of fetching a record
+        """
+        for test_case in TEST_VENDOR:
+            test_get = get_oui_record(TEST_OUI_STRING[test_case])
+            expected = {'oui': TEST_OUI_STRING[test_case], 'vendor': TEST_VENDOR[test_case], 'address': 'ADDRESS INFO'}
+            self.assertEqual(test_get, expected)
+
     def test_locally_administered(self):
         test_result = get_oui_vendor('4EAAAA')
         self.assertEqual(test_result, 'Locally administered')
@@ -84,6 +94,22 @@ class TestOUICache(TestCase):
         """
         with self.assertRaises(ValueError):
             get_oui_vendor(10)
+
+    def test_invalid_oui_cases(self):
+        """
+        Test the record fetching for cases where the input mac is invalid
+        """
+        local_cache = get_oui_cache()
+        test_cases = {
+            'asdfasdf': 'This is not a valid hex string',
+            'AAAA': 'OUI/MAC is shorter than 6 hex characters (24 bits) and too short to be any OUI',
+            'AAAA00001111DDDD2222FFFF': 'OUI/MAC is longer than 16 hex characters (64 bits) and longer than MAC addresses can be'
+        }
+
+        for test_case, result_note in test_cases.items():
+            result = local_cache.get_record(test_case)
+            expected = {'input': test_case, 'error': 'invalid', 'note': result_note}
+            self.assertEqual(result, expected)
 
 if __name__ == '__main__':
     main()
