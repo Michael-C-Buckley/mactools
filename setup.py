@@ -16,7 +16,7 @@ class CustomInstall(install):
 
 # Normal Install
 
-DESCRIPTION = 'MAC Address-focused library similar to `ipaddress`',
+DESCRIPTION = 'MAC Address-focused library similar to `ipaddress`'
 
 with open('README.md', 'r', encoding='utf-8') as readme:
     LONG_DESCRIPTION = readme.read()
