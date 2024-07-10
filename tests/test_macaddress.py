@@ -144,6 +144,12 @@ class TestFunctions(TestCase):
     def test_mac_binary(self):
         self.mac_test_iterator('binary', 'binary')
 
+    def test_get_eui64_suffix(self):
+        self.assertEqual(self.mac48.eui64_suffix, '266d:5eff:febb:99cc')
+
+    def test_get_link_local(self):
+        self.assertEqual(self.mac48.link_local_address, 'fe80::266d:5eff:febb:99cc')
+
     """
     Test Magic Methods
     """

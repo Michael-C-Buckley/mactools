@@ -22,7 +22,7 @@ with open('README.md', 'r', encoding='utf-8') as readme:
     LONG_DESCRIPTION = readme.read()
 
 setup(
-    name='MacTools',
+    name='mactools',
     author='Michael Buckley',
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,

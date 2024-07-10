@@ -4,7 +4,7 @@
 from __future__ import annotations
 from enum import Enum
 from functools import cached_property
-from re import search
+from ipaddress import IPv6Address as IPv6, AddressValueError
 from typing import Dict, Optional, Union, TYPE_CHECKING
 
 # Local Modules
@@ -168,6 +168,28 @@ class BaseMac:
         """
         return self.format_mac_address(self.__mac, MacNotation.SPACE)
     
+    @cached_property
+    def eui64_suffix(self) -> str:
+        """
+        Returns the EUI-64 suffix for an IPv6 address
+        """
+        if self.__eui == 48:
+            eui = str(self.clean)
+            swapped = hex(int(eui[1:2], 16)+2)[2:]
+            eui = f'{eui[:1]}{swapped}{eui[2:6]}fffe{eui[6:]}'
+        else:
+            # EUI-64 will assume it doesn't need to be flipped
+            eui = self.clean
+        return self.format_mac_address(eui, MacNotation.COLON, 'lower', interval=4)
+    
+    @cached_property
+    def link_local_address(self) -> str:
+        """
+        Returns the IPv6 link-local address based on the MAC address
+        """
+        return f'fe80::{self.eui64_suffix}'
+
+
     # CONVERSION METHODS
 
     @classmethod
@@ -186,7 +208,7 @@ class BaseMac:
     @classmethod
     def format_mac_address(cls, mac_address: str,
                            delimiter: MacNotation = MacNotation.COLON, 
-                           case: str = 'upper',
+                           case: str = 'upper', interval: int = None,
                            *args, **kwargs) -> str:
         """
         Takes a MAC address and re-formats it appropriately
@@ -195,7 +217,11 @@ class BaseMac:
 
         delimiter: str = delimiter.value
 
-        slice_len = 4 if delimiter == '.' else 2
+        if interval is None:
+            slice_len = 4 if delimiter == '.' else 2
+        else:
+            slice_len = interval
+        
         mac_slices = [mac_address[i:i+slice_len] for i in range(0, len(mac_address), slice_len)]
         joined_mac = delimiter.join(mac_slices)
 
@@ -236,3 +262,13 @@ class BaseMac:
         Return a binary representation of the input
         """
         return int(bin(input_number)[2:].zfill(bit_length))
+    
+    def get_global_address(self, global_prefix: str) -> IPv6:
+        """
+        Returns the GUA for the MAC address with supplied prefix
+        """
+        ip_address = f'{global_prefix}:{self.eui64_suffix}'
+        try:
+            return IPv6(ip_address)
+        except AddressValueError as e:
+            raise ValueError(f'Invalid IPv6 address: {ip_address}')
