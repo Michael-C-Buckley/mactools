@@ -27,21 +27,36 @@ of either delimiters, decimal, or binary. Such as:
 from mactools import MacAddress
 mac = MacAddress('00:11:22:AA:BB:CC')
 
-# returns the MAC without an delimiters or spaces
+# returns the MAC without an delimiters or spaces (001122AABBCC)
 mac.clean
 
-# returns the MAC with period delimiters
+# returns the MAC with period delimiters (0011.22AA.BBCC)
 mac.period
 
-# returns the decimal/numeric form
+# returns the decimal/numeric form (73596058572)
 mac.decimal
 
-# returns the OUI
+# returns the OUI (00:11:22)
 mac.oui
 ```
 
 The full format list includes: clean, colon, period, hyphen, space, oui,
 decimal, binary
+
+#### IPv6 Support
+
+This library has some methods for simplifying IPv6 SLAAC-based address creation:
+
+```python
+# returns the IPv6 Suffix/Interface ID in EUI-64 per RFC 4291 (0211:22ff:feaa:bbcc)
+mac.eui64_suffix
+
+# returns the Link-local address (fe80::0211:22ff:feaa:bbcc)
+mac.link_local_address
+
+# returns a Global Unicast Address (2001:db8::) as `ipaddress.IPv6Address`
+mac.get_global_address('2001:db8::0211:22ff:feaa:bbcc')
+```
 
 ### OUICache
 
