@@ -5,9 +5,6 @@ from typing import Union
 
 # Local Modules
 from mactools.basemac import BaseMac, MacNotation
-from mactools.oui_cache import get_oui_cache
-
-oui_cache = get_oui_cache()
 
 class MacAddress(BaseMac):
     """
@@ -23,6 +20,10 @@ class MacAddress(BaseMac):
             input_cache = kwargs.get(keyword)
             if input_cache:
                 break
+
+        if input_cache is None:
+            from mactools.oui_cache import get_oui_cache
+            oui_cache = get_oui_cache()
 
         init_cache = oui_cache if input_cache is None else input_cache
         super().__init__(mac, format, oui_cache=init_cache)

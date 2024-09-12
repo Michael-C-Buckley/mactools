@@ -2,28 +2,19 @@
 
 # Python Modules
 from datetime import datetime
-from enum import Enum
+from json import load
 from re import search
 from typing import Dict
+from urllib.request import urlopen
 
 # Local Modules
 from mactools.mac_common import prepare_oui
 from mactools.tools_common import get_hex_value
 
 from mactools.oui_cache.oui_common import (
-    VERSION,
-    fixed_ouis,
-    specific_macs,
-    mac_ranges
+    VERSION, OUIType, create_oui_dict,
+    fixed_ouis, specific_macs, mac_ranges
 )
-
-class OUIType(Enum):
-    """
-    Differentiator for IEEE MAC OUI Registry sizes
-    """
-    OUI36 = 'MA-S'
-    OUI28 = 'MA-M'
-    OUI = 'MA-L'
     
 
 class OUICache:
@@ -38,7 +29,13 @@ class OUICache:
             cls._instance._initialized = False
         return cls._instance
     
-    def __init__(self, oui_dict: Dict[OUIType, Dict[str, str]]) -> None:
+    @classmethod
+    def replace_instance(cls, new):
+        """"""
+        cls._instance = new
+    
+    def __init__(self, oui_dict: Dict[OUIType, Dict[str, str]], attempt_update: bool = True) -> None:
+        self.attempt_update = attempt_update
         self.version: str = VERSION
         self.timestamp: datetime = datetime.now()
         self.oui_dict: Dict[OUIType, Dict[str, str]] = oui_dict
@@ -95,6 +92,15 @@ class OUICache:
             if result:
                 return result
             
+        # Check to see if the record exists but isn't in the cache, in which trigger an update
+        with urlopen(f'https://api.maclookup.app/v2/macs/{input_mac}') as response:
+            if response.code == 200:
+                result = load(response)
+                
+                if result['success'] == True:
+                    self.oui_dict = create_oui_dict(update=True)
+                    return {'oui': result['macPrefix'], 'vendor': result['company']}
+            
         # Fall-through case for valid OUI without any registration
         return {'oui': oui, 'vendor': 'Unregistered', 'note': 'This OUI is valid but has no associated registration in the IEEE global registry (MA-L, MA-M, or MA-S)'}
             
@@ -107,4 +113,3 @@ class OUICache:
             if record_dict.get('error'):
                 raise ValueError(record_dict['error'])
             return record_dict.get('vendor')
-        

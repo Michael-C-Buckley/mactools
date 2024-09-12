@@ -10,13 +10,14 @@ async def get_csv_file(endpoint: str, dest_path: str, overwrite: bool) -> None:
     """
     Coroutine for fetching individual CSV file from IEEE
     """
-    if path.exists(dest_path) and not overwrite:
+    filename = f'{path.join(dest_path, endpoint.split("/")[1])}.csv'
+    if path.exists(filename) and not overwrite:
         return True
     url = f'https://standards-oui.ieee.org/{endpoint}.csv'
     filename = f'{path.join(dest_path, endpoint.split("/")[1])}.csv'
     try:
-        urlretrieve(url, filename)
-    except:
+        result = urlretrieve(url, filename)
+    except Exception as e:
         return False
     else:
         return True
