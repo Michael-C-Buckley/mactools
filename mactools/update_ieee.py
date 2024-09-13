@@ -4,7 +4,7 @@
 from asyncio import gather, run
 from os import makedirs, path
 from pkg_resources import resource_filename
-from urllib.request import urlretrieve
+from urllib.request import urlopen, Request
 
 async def get_csv_file(endpoint: str, dest_path: str, overwrite: bool) -> None:
     """
@@ -15,12 +15,36 @@ async def get_csv_file(endpoint: str, dest_path: str, overwrite: bool) -> None:
         return True
     url = f'https://standards-oui.ieee.org/{endpoint}.csv'
     filename = f'{path.join(dest_path, endpoint.split("/")[1])}.csv'
+
+    headers = {
+        'User-Agent': 'MacTools/1.5 (https://github.com/Michael-C-Buckley/mactools)'
+    }
+
+
     try:
-        result = urlretrieve(url, filename)
+        with urlopen(Request(url, headers=headers)) as response:
+            if response.status == 200:
+                with open(filename, 'wb') as file:
+                    file.write(response.read())
+                return True
     except Exception as e:
-        return False
-    else:
-        return True
+        pass
+
+    return False
+
+    # try:
+        # result = urlretrieve(url, filename)
+    # except Exception as e:
+        # return False
+    # else:
+        # return True
+
+# def update_wireshark(overwrite:bool = True) -> bool:
+#     """
+#     Procedure for updating the IEEE CSV from Wireshark's databse
+#     """
+
+#     url = 'https://www.wireshark.org/download/automated/data/manuf.gz'
 
 def update_ieee_files(overwrite: bool = True) -> bool:
     """
