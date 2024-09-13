@@ -13,7 +13,8 @@ from mactools.tools_common import get_hex_value
 
 from mactools.oui_cache.oui_common import (
     VERSION, OUIType, create_oui_dict,
-    fixed_ouis, specific_macs, mac_ranges
+    fixed_ouis, specific_macs, mac_ranges,
+    UPDATE
 )
     
 
@@ -98,8 +99,26 @@ class OUICache:
                 result = load(response)
                 
                 if result['success'] == True:
-                    self.oui_dict = create_oui_dict(update=True)
-                    return {'oui': result['macPrefix'], 'vendor': result['company']}
+
+                    # Update the entire cache due to invalidation
+                    if UPDATE is True:
+                        self.oui_dict = create_oui_dict(update=True)
+
+                    if result['found'] == True:
+
+                        api_oui = result['macPrefix']
+                        vendor = result['company']
+
+                        # Add it to the run-time cache of which assumes MA-L entries currently
+                        # This is chosen when not completely updating the whole cache
+                        if UPDATE is False:
+                            self.oui_dict[OUIType('MA-L')][api_oui] = {
+                                'vendor' : vendor,
+                                'oui': api_oui,
+                                'address': result['address'],
+                            }
+
+                        return {'oui': api_oui, 'vendor': vendor}
             
         # Fall-through case for valid OUI without any registration
         return {'oui': oui, 'vendor': 'Unregistered', 'note': 'This OUI is valid but has no associated registration in the IEEE global registry (MA-L, MA-M, or MA-S)'}

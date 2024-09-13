@@ -6,7 +6,10 @@ from json import dumps
 from re import search, compile, Match
 from typing import Any
 from unittest import TestCase
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
+
+# PATCH MACTOOLS TO PREVENT IEEE URL FROM BEING ACCESSED
+# patch('mactools.update_ieee.update_ieee_files', return_value=True).start()
 
 # Local Modules
 from mactools import MacAddress
@@ -29,10 +32,17 @@ TEST_RECORD = {
     'vendor': TEST_VENDOR[OUIType.OUI],
     'address': 'ADDRESS INFO'
 }
-TEST_CACHE = OUICache({i: {TEST_OUI_STRING[i]: {'vendor': TEST_VENDOR[i], 'oui': TEST_OUI_STRING[i], 'address': 'ADDRESS INFO'}} for i in TEST_VENDOR})
+TEST_OUI_DICT = {i: {TEST_OUI_STRING[i]: {'vendor': TEST_VENDOR[i], 'oui': TEST_OUI_STRING[i], 'address': 'ADDRESS INFO'}} for i in TEST_VENDOR}
+TEST_CACHE = OUICache(TEST_OUI_DICT, False)
 
 OUI_CORE_PATH = 'mactools.oui_cache.oui_core'
+OUI_COMMON_PATH = 'mactools.oui_cache.oui_common'
 OUI_CLASSES_PATH = 'mactools.oui_cache.oui_classes'
+
+# urllib mock
+URL_MOCK = Mock()
+URL_MOCK.status = 200
+URL_MOCK.read.return_value = b'{"success":true,"found":true,"macPrefix":"AA0000","company":"Test GET"}'
 
 @dataclass
 class TestMac:

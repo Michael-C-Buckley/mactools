@@ -10,15 +10,10 @@ if TYPE_CHECKING:
 
 # Local modules
 from mactools.oui_cache.oui_core import (
-    get_oui_cache,
-    get_oui_record,
-    get_oui_vendor,
+    get_oui_cache, get_oui_record, get_oui_vendor,
 )
 from tests.test_common import (
-    OUICache,
-    OUI_CORE_PATH,
-    TEST_OUI_STRING,
-    TEST_VENDOR,
+    OUICache, URL_MOCK, OUI_COMMON_PATH, TEST_OUI_STRING, TEST_VENDOR,
 )
 
 class TestOUICache(TestCase):
@@ -27,9 +22,13 @@ class TestOUICache(TestCase):
         cls.patchers: list[_patch_default_new] = []
 
         cls.patchers.append(patch('builtins.print', return_value=None))
+        cls.patchers.append(patch('urllib.request.urlopen', return_value=URL_MOCK))
 
         for patcher in cls.patchers:
             patcher.start()
+
+        cls.cache = get_oui_cache()
+        cls.cache.attempt_update = False
     
     @classmethod
     def tearDownClass(cls) -> None:
@@ -49,7 +48,7 @@ class TestOUICache(TestCase):
         self.assertEqual(local_cache, second_cache)
 
     @patch(f'os.path.exists')
-    @patch.multiple(OUI_CORE_PATH, update_ieee_files=DEFAULT, process_ieee_csv=DEFAULT)
+    @patch.multiple(OUI_COMMON_PATH, update_ieee_files=DEFAULT, process_ieee_csv=DEFAULT)
     def test_cache_with_updates(self, path_exists: Mock, update_ieee_files: Mock, process_ieee_csv: Mock):
         path_exists.return_value = False
         update_ieee_files.return_value = True

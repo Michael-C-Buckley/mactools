@@ -4,6 +4,7 @@
 from re import match, Pattern
 from typing import Optional
 from unittest import TestCase, main
+from unittest.mock import Mock, MagicMock, patch
 
 # Local Modules
 from tests.test_common import (
@@ -58,7 +59,14 @@ class TestFunctions(TestCase):
             for regex, case in case_lookup.items():
                 self.assertTrue(match(regex, case))
 
-    def test_mac_validation(self):
+    @patch('mactools.oui_cache.oui_classes.create_oui_dict')
+    def test_mac_validation(self, mocked_create: Mock):
+
+        # The exact values of the support functions are not relevant
+        mocked_create.return_value = TEST_CACHE.oui_dict
+        mock_response = MagicMock()
+        mock_response.code = 404
+
         for invalid_mac in [
             'a',
             '00:11:AA:BB',
@@ -76,8 +84,9 @@ class TestFunctions(TestCase):
             for mac_MacNotation in MacNotation:
                 valid_macs.append(create_random_mac(eui, mac_MacNotation))
 
-        for valid_mac in valid_macs:
-            self.assertIsInstance(MacAddress(valid_mac), MacAddress)
+        with patch('mactools.oui_cache.oui_classes.urlopen', return_value=mock_response):
+            for valid_mac in valid_macs:
+                self.assertIsInstance(MacAddress(valid_mac), MacAddress)
 
     def test_cache_with_creation(self):
         """
@@ -183,4 +192,3 @@ class TestFunctions(TestCase):
 
 if __name__ == '__main__':
     main()
-    # oui_cache_patch.stop()
