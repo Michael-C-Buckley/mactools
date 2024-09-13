@@ -8,8 +8,8 @@ from typing import Any
 from unittest import TestCase
 from unittest.mock import Mock, patch
 
-# PATCH MACTOOLS TO PREVENT IEEE URL FROM BEING ACCESSED
-# patch('mactools.update_ieee.update_ieee_files', return_value=True).start()
+# STOP THE API COOLDOWN
+patch('mactools.oui_cache.oui_classes.sleep', return_value=None).start()
 
 # Local Modules
 from mactools import MacAddress

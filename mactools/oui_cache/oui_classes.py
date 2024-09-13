@@ -4,6 +4,7 @@
 from datetime import datetime
 from json import load
 from re import search
+from time import sleep
 from typing import Dict
 from urllib.request import urlopen
 
@@ -95,33 +96,45 @@ class OUICache:
             
         # Check to see if the record exists but isn't in the cache, in which trigger an update
         with urlopen(f'https://api.maclookup.app/v2/macs/{input_mac}') as response:
+
+            # Fall-through case for valid OUI without any registration
+            no_entry_note = 'This OUI is valid but has no associated registration in the IEEE global registry (MA-L, MA-M, or MA-S)'
+            no_entry_dict = {'oui': oui,
+                            'vendor': 'Unregistered',
+                            'note': no_entry_note,
+                            }
+            
+            # Stateless delay to prevent 429 from the endpoint
+            sleep(0.5)
+
             if response.code == 200:
                 result = load(response)
                 
-                if result['success'] == True:
+                if result['success'] != True:
+                    
+                    return no_entry_dict
 
-                    # Update the entire cache due to invalidation
-                    if UPDATE is True:
-                        self.oui_dict = create_oui_dict(update=True)
+                # Update the entire cache due to invalidation
+                if UPDATE is True:
+                    self.oui_dict = create_oui_dict(update=True)
 
-                    if result['found'] == True:
+                if result['found'] != True:
+                    return no_entry_dict
 
-                        api_oui = result['macPrefix']
-                        vendor = result['company']
+                api_oui = result['macPrefix']
+                vendor = result['company']
 
-                        # Add it to the run-time cache of which assumes MA-L entries currently
-                        # This is chosen when not completely updating the whole cache
-                        if UPDATE is False:
-                            self.oui_dict[OUIType('MA-L')][api_oui] = {
-                                'vendor' : vendor,
-                                'oui': api_oui,
-                                'address': result['address'],
-                            }
+                # Add it to the run-time cache of which assumes MA-L entries currently
+                # This is chosen when not completely updating the whole cache
+                if UPDATE is False:
+                    self.oui_dict[OUIType('MA-L')][api_oui] = {
+                        'vendor' : vendor,
+                        'oui': api_oui,
+                        'address': result['address'],
+                    }
 
-                        return {'oui': api_oui, 'vendor': vendor}
-            
-        # Fall-through case for valid OUI without any registration
-        return {'oui': oui, 'vendor': 'Unregistered', 'note': 'This OUI is valid but has no associated registration in the IEEE global registry (MA-L, MA-M, or MA-S)'}
+                return {'oui': api_oui, 'vendor': vendor}
+        
             
     def get_vendor(self, input_mac: str) -> str:
         """
