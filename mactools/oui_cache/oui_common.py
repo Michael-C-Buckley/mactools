@@ -21,7 +21,7 @@ BASE_IEEE_PATH = resource_filename('mactools', 'resources/ieee')
 IEEE_FILE_PATHS = [path.join(BASE_IEEE_PATH, f'{i}.csv') for i in ['oui36', 'mam', 'oui']]
 
 # Flag to mark the cache for update immediately when the cache is invalidated
-UPDATE = True
+UPDATE_IEEE = True
 
 
 class OUIType(Enum):

@@ -20,7 +20,6 @@ async def get_csv_file(endpoint: str, dest_path: str, overwrite: bool) -> None:
         'User-Agent': 'MacTools/1.5 (https://github.com/Michael-C-Buckley/mactools)'
     }
 
-
     try:
         with urlopen(Request(url, headers=headers)) as response:
             if response.status == 200:
@@ -31,20 +30,6 @@ async def get_csv_file(endpoint: str, dest_path: str, overwrite: bool) -> None:
         pass
 
     return False
-
-    # try:
-        # result = urlretrieve(url, filename)
-    # except Exception as e:
-        # return False
-    # else:
-        # return True
-
-# def update_wireshark(overwrite:bool = True) -> bool:
-#     """
-#     Procedure for updating the IEEE CSV from Wireshark's databse
-#     """
-
-#     url = 'https://www.wireshark.org/download/automated/data/manuf.gz'
 
 def update_ieee_files(overwrite: bool = True) -> bool:
     """

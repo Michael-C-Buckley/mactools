@@ -15,7 +15,7 @@ from mactools.tools_common import get_hex_value
 from mactools.oui_cache.oui_common import (
     VERSION, OUIType, create_oui_dict,
     fixed_ouis, specific_macs, mac_ranges,
-    UPDATE
+    UPDATE_IEEE
 )
     
 
@@ -115,7 +115,7 @@ class OUICache:
                     return no_entry_dict
 
                 # Update the entire cache due to invalidation
-                if UPDATE is True:
+                if UPDATE_IEEE is True:
                     self.oui_dict = create_oui_dict(update=True)
 
                 if result['found'] != True:
@@ -126,7 +126,7 @@ class OUICache:
 
                 # Add it to the run-time cache of which assumes MA-L entries currently
                 # This is chosen when not completely updating the whole cache
-                if UPDATE is False:
+                if UPDATE_IEEE is False:
                     self.oui_dict[OUIType('MA-L')][api_oui] = {
                         'vendor' : vendor,
                         'oui': api_oui,
