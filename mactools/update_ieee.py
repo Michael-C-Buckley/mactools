@@ -3,8 +3,11 @@
 # Python Modules
 from asyncio import gather, run
 from os import makedirs, path
-from pkg_resources import resource_filename
+from importlib.resources import files
 from urllib.request import urlopen, Request
+
+# Local Modules
+from mactools.version import __version__
 
 async def get_csv_file(endpoint: str, dest_path: str, overwrite: bool) -> None:
     """
@@ -17,7 +20,7 @@ async def get_csv_file(endpoint: str, dest_path: str, overwrite: bool) -> None:
     filename = f'{path.join(dest_path, endpoint.split("/")[1])}.csv'
 
     headers = {
-        'User-Agent': 'MacTools/1.6 (https://github.com/Michael-C-Buckley/mactools)'
+        'User-Agent': f'MacTools/{__version__} (https://github.com/Michael-C-Buckley/mactools)'
     }
 
     try:
@@ -36,7 +39,7 @@ def update_ieee_files(overwrite: bool = True) -> bool:
     Procedure for updating the IEEE CSV files within the project
     """
     print('MacTools: Fetching IEEE files...', end='\r')
-    dest_path = resource_filename('mactools', 'resources/ieee')
+    dest_path = files('mactools').joinpath('resources/ieee')
 
     makedirs(dest_path, exist_ok=True)
 
