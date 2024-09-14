@@ -17,7 +17,7 @@ async def get_csv_file(endpoint: str, dest_path: str, overwrite: bool) -> None:
     filename = f'{path.join(dest_path, endpoint.split("/")[1])}.csv'
 
     headers = {
-        'User-Agent': 'MacTools/1.5 (https://github.com/Michael-C-Buckley/mactools)'
+        'User-Agent': 'MacTools/1.6 (https://github.com/Michael-C-Buckley/mactools)'
     }
 
     try:
