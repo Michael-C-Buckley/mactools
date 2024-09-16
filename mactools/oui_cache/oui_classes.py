@@ -51,22 +51,30 @@ class OUICache:
 
         hex_value = get_hex_value(oui)
         if hex_value == -1:
-            return {'input': input_mac, 'error': 'invalid', 'note': 'This is not a valid hex string'}
+            return {'input': input_mac, 'error': True, 'note': 'This is not a valid hex string'}
         if hex_value < 24:
-            return {'input': input_mac, 'error': 'invalid', 'note': 'OUI/MAC is shorter than 6 hex characters (24 bits) and too short to be any OUI'}
+            return {'input': input_mac, 'error': True, 'note': 'OUI/MAC is shorter than 6 hex characters (24 bits) and too short to be any OUI'}
         if hex_value > 64:
-            return {'input': input_mac, 'error': 'invalid', 'note': 'OUI/MAC is longer than 16 hex characters (64 bits) and longer than MAC addresses can be'}
+            return {'input': input_mac, 'error': True, 'note': 'OUI/MAC is longer than 16 hex characters (64 bits) and longer than MAC addresses can be'}
 
+        base_dict = {
+            'oui': input_mac,
+            'error': False,
+        }
+        
         def check_locally_administered(input_mac: str):
             # Identify a locally administered MAC via U/L of the first byte
             if bin(int(input_mac[:2], 16))[2:].zfill(8)[6] == '1':
-                return {'oui': input_mac, 'vendor': 'Locally administered'}
+                base_dict['vendor'] = 'Locally administered'
+                return base_dict
+                
 
         def check_range(input_mac: str):
             # Check MACs within a set range
             for mac_criteria, info in mac_ranges.items():
                 if search(mac_criteria, input_mac):
-                    return {'oui': input_mac, 'vendor': info}
+                    base_dict['vendor'] = info
+                    return base_dict
                 
         func_dict = {
             specific_macs.get: oui,
@@ -80,7 +88,8 @@ class OUICache:
             if isinstance(result, dict):
                 return result
             elif isinstance(result, str):
-                return {'oui': oui, 'vendor': result}
+                base_dict['vendor'] = result
+                return base_dict
 
         key_length_map = {
             OUIType.OUI36: 9,
@@ -92,6 +101,7 @@ class OUICache:
             inner_dict: Dict[str, str] = self.oui_dict.get(oui_type)
             result = inner_dict.get(oui[:key_len])
             if result:
+                result['error'] = False
                 return result
             
         # Check to see if the record exists but isn't in the cache, in which trigger an update

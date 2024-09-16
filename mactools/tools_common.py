@@ -29,7 +29,7 @@ def get_hex_value(hex_string: str) -> int:
     """
     bit_value = 0
     for char in hex_string:
-        if (match := search(r'([0-9a-fA-F])?([ -\.:])?', char)):
+        if (match := search(r'([0-9a-fA-F])?([ \-\.:])?', char)):
             if match.group(1):
                 bit_value += 4
             elif match.group(2):

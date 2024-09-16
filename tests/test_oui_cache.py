@@ -13,7 +13,8 @@ from mactools.oui_cache.oui_core import (
     get_oui_cache, get_oui_record, get_oui_vendor,
 )
 from tests.test_common import (
-    OUICache, URL_MOCK, OUI_COMMON_PATH, TEST_OUI_STRING, TEST_VENDOR,
+    OUICache, generate_random_str, URL_MOCK, OUI_COMMON_PATH,
+    TEST_OUI_STRING, TEST_VENDOR, TEST_OUI_DICT
 )
 
 class TestOUICache(TestCase):
@@ -71,8 +72,15 @@ class TestOUICache(TestCase):
         Standard testing of fetching a record
         """
         for test_case in TEST_VENDOR:
+
+            expected = {
+                'oui': TEST_OUI_STRING[test_case],
+                'vendor': TEST_VENDOR[test_case],
+                'address': 'ADDRESS INFO',
+                'error': False,
+            }
+
             test_get = get_oui_record(TEST_OUI_STRING[test_case])
-            expected = {'oui': TEST_OUI_STRING[test_case], 'vendor': TEST_VENDOR[test_case], 'address': 'ADDRESS INFO'}
             self.assertEqual(test_get, expected)
 
     def test_locally_administered(self):
@@ -107,8 +115,16 @@ class TestOUICache(TestCase):
 
         for test_case, result_note in test_cases.items():
             result = local_cache.get_record(test_case)
-            expected = {'input': test_case, 'error': 'invalid', 'note': result_note}
+            expected = {'input': test_case, 'error': True, 'note': result_note}
             self.assertEqual(result, expected)
+
+    def test_fuzz_oui_cache(self):
+        with patch('mactools.oui_cache.oui_classes.create_oui_dict') as patched_update:
+            patched_update.return_value = TEST_OUI_DICT
+            for i in range(100000):
+                test_str = generate_random_str()
+                test_result = get_oui_record(test_str)
+
 
 if __name__ == '__main__':
     main()

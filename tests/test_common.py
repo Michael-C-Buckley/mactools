@@ -3,7 +3,9 @@
 # Python Modules
 from dataclasses import dataclass
 from json import dumps
+from random import choice, randint
 from re import search, compile, Match
+from string import ascii_letters, digits, punctuation
 from typing import Any
 from unittest import TestCase
 from unittest.mock import Mock, patch
@@ -89,3 +91,11 @@ def test_regex_comparison(test_obj: TestCase, pattern: str, test_func: callable,
     for test_sample in test_list:
         test_match = search(test_regex, test_sample)
         test_obj.assertIsInstance(test_match, Match)
+
+def generate_random_str(length: int = 0) -> str:
+    """
+    Generate a random string of characters, digits, and punctuation for fuzzing
+    """
+    length = randint(0,50) if length == 0 else length
+    chars = ascii_letters + digits + punctuation
+    return ''.join(choice(chars) for _ in range(length))

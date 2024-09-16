@@ -9,6 +9,7 @@ from unittest.mock import Mock, MagicMock, patch
 # Local Modules
 from tests.test_common import (
     TestMac,
+    generate_random_str,
     SAMPLE_EUI48,
     SAMPLE_EUI64,
     TEST_RECORD,
@@ -178,8 +179,6 @@ class TestFunctions(TestCase):
     def test_magic_add(self):
         self.assertEqual(self.mac48+1, '24:6D:5E:BB:99:CD')
         self.assertEqual(self.mac64+1, '24:6D:5E:00:00:BB:99:DE')
-        
-        self
 
     def test_magic_subtract(self):
         # Testing MAC-and-MAC subtraction
@@ -189,6 +188,14 @@ class TestFunctions(TestCase):
         self.assertEqual(self.mac48-1, '24:6D:5E:BB:99:CB')
         self.assertEqual(self.mac64-1, '24:6D:5E:00:00:BB:99:DC')
 
+    def test_fuzz_mac(self):
+        for i in range(100000):
+            test_str = generate_random_str()
+            try:
+                test_mac = MacAddress(test_str)
+                self.assertNotEqual(test_mac.validate_mac(test_str), 0)
+            except ValueError:
+                pass
 
 if __name__ == '__main__':
     main()
