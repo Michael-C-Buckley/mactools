@@ -3,10 +3,10 @@ from concurrent.futures import ThreadPoolExecutor as Executor
 from csv import reader
 from enum import Enum
 from io import StringIO
-from os import path
+from os import path, remove
 from importlib.resources import files
+from tempfile import gettempdir
 from typing import Dict, TYPE_CHECKING
-
 
 # Common Re-used Imports
 from mactools import __version__ as VERSION
@@ -58,6 +58,56 @@ mac_ranges: dict[str, str] = {
 }
 
 
+
+def handle_paths():
+    """
+    Check to see which paths are writeable for the IEEE CSV files.
+    First preference is the library's folder
+    Fallback is the temporary files of the computer
+    """
+    # Constructs to create and track the file paths and statuses
+    create_file_paths = lambda x: [path.join(x, f'{i}.csv') for i in ['oui36', 'mam', 'oui']]
+    base_ieee_path = files('mactools').joinpath('resources/ieee')
+    temp_ieee_path = path.join(gettempdir(), 'python3-mactools')
+
+    library_path_list = create_file_paths(base_ieee_path)
+    temp_path_list = create_file_paths(temp_ieee_path)
+
+    path_status = {
+        "library": None,
+        "temp": None,
+    }
+
+    local_list = [(library_path_list, "library"), (temp_path_list, "temp")]
+
+    # Check to see those constructed pathes
+    for ieee_path, which_path in local_list:
+        for file_path in (ieee_path):
+            if not path.exists(file_path):
+                path_status[which_path] = False
+                break
+            else:
+                path_status[which_path] = True
+
+    # A hit on either means we have files
+    if path_status['library']:
+        return library_path_list
+    if path_status['temp']:
+        return temp_path_list
+    
+    # No hits prompts a writeable check
+    try:
+        test_file = path.join(base_ieee_path, 'writetest')
+        with open(test_file, 'w') as file:
+            file.write('This is only a test')
+        remove(test_file)
+    except IOError:
+        # Library path not writeable, use the temp directory
+        return temp_path_list
+    
+    return library_path_list
+
+
 def process_ieee_csv(file_path: str) -> Dict[OUIType, Dict[str, str]]:
     """
     Converts the IEEE CSV response into a Python dictionary
@@ -91,16 +141,18 @@ def create_oui_dict(update: bool = False) -> Dict['OUIType', Dict[str, str]]:
     """
     if update is True:
         update_ieee_files()
+
+    file_paths = handle_paths()
         
-    for file_path in IEEE_FILE_PATHS:
+    for file_path in file_paths:
         if not path.exists(file_path):
             update_ieee_files(overwrite=False)
 
-    for file_path in IEEE_FILE_PATHS:
+    for file_path in file_paths:
         process_ieee_csv(file_path)
 
     with Executor(max_workers=3) as executor:
-        oui_dicts = executor.map(process_ieee_csv, IEEE_FILE_PATHS)
+        oui_dicts = executor.map(process_ieee_csv, file_paths)
 
     final_dict = {}
     for oui_dict in oui_dicts:
