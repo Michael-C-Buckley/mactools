@@ -17,11 +17,13 @@ def get_oui_cache(regenerate: bool = False) -> OUICache:
 
     return OUICache(create_oui_dict())
 
+
 def get_oui_record(input_mac: str) -> Optional[Dict[str, str]]:
     """
     Gets the record of a MAC or OUI
     """
     return get_oui_cache().get_record(input_mac)
+
 
 def get_oui_vendor(input_mac: str) -> str:
     """
