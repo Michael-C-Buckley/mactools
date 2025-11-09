@@ -3,10 +3,7 @@
     self',
     pkgs,
     ...
-  }: let
-    shellLines = ''
-    '';
-  in {
+  }: {
     devShells = {
       default = pkgs.mkShell {
         env = {
@@ -15,7 +12,15 @@
         };
         buildInputs = with pkgs; [
           # Python
-          python313
+          (python313.withPackages (ps:
+            with ps; [
+              pip
+              setuptools
+              wheel
+              build
+              twine
+              unittest-xml-reporting
+            ]))
           uv
           ruff
           gcc

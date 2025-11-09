@@ -1,0 +1,22 @@
+assert_lefthook_installed = true
+
+[pre-commit.commands.typos]
+glob = "*.{py,md,txt,yml,yaml,toml}"
+run = "typos -c .config/typos.toml {staged_files}"
+
+[pre-commit.commands.ruff-format]
+glob = "*.py"
+run = "ruff format {staged_files}"
+stage_fixed = true
+
+[pre-commit.commands.ruff-check]
+glob = "*.py"
+run = "ruff check {staged_files}"
+
+[pre-commit.commands.bandit]
+glob = "*.py"
+run = "bandit -r {staged_files} -c pyproject.toml"
+
+[pre-commit.commands.unittest]
+glob = "^(mactools/|tests/)"
+run = "python -m unittest discover tests/ -q"
