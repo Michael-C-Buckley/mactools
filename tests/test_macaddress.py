@@ -51,7 +51,7 @@ class TestFunctions(TestCase):
 
         for case_lookup in [fixed_lookup, random_lookup]:
             for regex, case in case_lookup.items():
-                self.assertTrue(match(regex, case))
+                self.assertTrue(match(regex, case))  # nosec B101
 
     @patch("mactools.oui_cache.oui_classes.create_oui_dict")
     def test_mac_validation(self, mocked_create: Mock):
@@ -88,14 +88,14 @@ class TestFunctions(TestCase):
         Tests passing `OUICache` instance on creation and auto-fetching record
         """
         local_test_mac = MacAddress(SAMPLE_EUI48.mac, cache=TEST_CACHE)
-        assert local_test_mac.vendor == TEST_RECORD.get("vendor")
+        assert local_test_mac.vendor == TEST_RECORD.get("vendor")  # nosec B101
 
     def test_mac_get_vendor(self):
         """
         Tests
         """
         local_test_mac = MacAddress(SAMPLE_EUI48.mac, cache=TEST_CACHE)
-        assert local_test_mac.vendor == TEST_CACHE.get_vendor(SAMPLE_EUI48.mac)
+        assert local_test_mac.vendor == TEST_CACHE.get_vendor(SAMPLE_EUI48.mac)  # nosec B101
 
     """
     Test the various MAC Properties
@@ -122,7 +122,7 @@ class TestFunctions(TestCase):
                 start, stop = slicing
                 match_detail = match_detail[start:stop]
 
-            assert mac_detail == match_detail
+            assert mac_detail == match_detail  # nosec B101
 
     def test_mac_oui(self):
         self.mac_test_iterator("oui", "mac", slicing=(0, 8))
@@ -137,8 +137,8 @@ class TestFunctions(TestCase):
         self.mac_test_iterator("colon", "mac")
 
     def test_mac_period(self):
-        assert self.mac48.period == "246D.5EBB.99CC"
-        assert self.mac64.period == "246D.5E00.00BB.99DD"
+        assert self.mac48.period == "246D.5EBB.99CC"  # nosec B101
+        assert self.mac64.period == "246D.5E00.00BB.99DD"  # nosec B101
 
     def test_mac_hyphen(self):
         self.mac_test_iterator("hyphen", "mac", (":", "-"))
@@ -153,46 +153,44 @@ class TestFunctions(TestCase):
         self.mac_test_iterator("binary", "binary")
 
     def test_get_eui64_suffix(self):
-        assert self.mac48.eui64_suffix == "266d:5eff:febb:99cc"
+        assert self.mac48.eui64_suffix == "266d:5eff:febb:99cc"  # nosec B101
 
     def test_get_link_local(self):
-        assert self.mac48.link_local_address == "fe80::266d:5eff:febb:99cc"
+        assert self.mac48.link_local_address == "fe80::266d:5eff:febb:99cc"  # nosec B101
 
-    """
-    Test Magic Methods
-    """
+    """Test Magic Methods"""
 
     def test_magic_str(self):
         for mac, test_mac in self.mac_lookup.items():
-            assert str(mac) == test_mac.mac
+            assert str(mac) == test_mac.mac  # nosec B101
 
     def test_magic_hash(self):
         for mac, test_mac in self.mac_lookup.items():
-            assert mac.__hash__() == hash(test_mac.mac.replace(":", ""))
+            assert mac.__hash__() == hash(test_mac.mac.replace(":", ""))  # nosec B101
 
     def test_magic_equal(self):
         for mac, test_mac in self.mac_lookup.items():
-            assert mac == MacAddress(test_mac.mac)
-            assert not ("this should be false" == mac)
+            assert mac == MacAddress(test_mac.mac)  # nosec B101
+            assert not ("this should be false" == mac)  # nosec B101
 
     def test_magic_add(self):
-        assert self.mac48 + 1 == "24:6D:5E:BB:99:CD"
-        assert self.mac64 + 1 == "24:6D:5E:00:00:BB:99:DE"
+        assert self.mac48 + 1 == "24:6D:5E:BB:99:CD"  # nosec B101
+        assert self.mac64 + 1 == "24:6D:5E:00:00:BB:99:DE"  # nosec B101
 
     def test_magic_subtract(self):
         # Testing MAC-and-MAC subtraction
         for mac in self.mac_lookup:
-            assert mac - mac == 0
+            assert mac - mac == 0  # nosec B101
         # Testing MAC-and-number subtraction
-        assert self.mac48 - 1 == "24:6D:5E:BB:99:CB"
-        assert self.mac64 - 1 == "24:6D:5E:00:00:BB:99:DC"
+        assert self.mac48 - 1 == "24:6D:5E:BB:99:CB"  # nosec B101
+        assert self.mac64 - 1 == "24:6D:5E:00:00:BB:99:DC"  # nosec B101
 
     def test_fuzz_mac(self):
         for i in range(100000):
             test_str = generate_random_str()
             try:
                 test_mac = MacAddress(test_str)
-                assert test_mac.validate_mac(test_str) != 0
+                assert test_mac.validate_mac(test_str) != 0  # nosec B101
             except ValueError:
                 pass
 

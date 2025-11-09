@@ -65,7 +65,7 @@ def create_random_hex_bit() -> str:
     """
     Returns a single bit between 0-9 or A-F
     """
-    return hex(randint(0, 15))[2:3].upper()
+    return hex(randint(0, 15))[2:3].upper()  # nosec B311
 
 
 def create_random_hex_string(length: int = 2) -> str:

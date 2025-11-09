@@ -121,6 +121,6 @@ def generate_random_str(length: int = 0) -> str:
     """
     Generate a random string of characters, digits, and punctuation for fuzzing
     """
-    length = randint(0, 50) if length == 0 else length
+    length = randint(0, 50) if length == 0 else length  # nosec B311
     chars = ascii_letters + digits + punctuation
-    return "".join(choice(chars) for _ in range(length))
+    return "".join(choice(chars) for _ in range(length))  # nosec B311

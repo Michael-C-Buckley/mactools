@@ -30,7 +30,7 @@ class TestMACCommon(TestCase):
         """
         test_case_dict = {111: "006F", "ac": "00AC"}
         for test_input, result in test_case_dict.items():
-            assert fill_hex(test_input, 4) == result
+            assert fill_hex(test_input, 4) == result  # nosec B101
 
     def test_hex_range(self):
         """
@@ -45,7 +45,7 @@ class TestMACCommon(TestCase):
             expected_result_list.append(test_result)
 
         for i, test_mac in enumerate(hex_range(2)):
-            assert test_mac == expected_result_list[i]
+            assert test_mac == expected_result_list[i]  # nosec B101
 
     def test_prepare_oui(self):
         """
@@ -56,11 +56,11 @@ class TestMACCommon(TestCase):
 
         for test_case_48 in [MAC48, SAMPLE_EUI48.mac]:
             result = prepare_oui(test_case_48, False)
-            assert result == test_oui
+            assert result == test_oui  # nosec B101
 
         for test_case_64 in [MAC64, SAMPLE_EUI64.mac]:
             result = prepare_oui(test_case_64, False)
-            assert result == test_oui
+            assert result == test_oui  # nosec B101
 
     def test_create_random_hex_bit(self):
         """

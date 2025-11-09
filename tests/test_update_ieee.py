@@ -41,25 +41,25 @@ class TestUpdate(TestCase):
 
         test_result = update_ieee_files()
 
-        assert test_result is True
-        assert mock_fileopen.call_count == 3
+        assert test_result is True  # nosec B101
+        assert mock_fileopen.call_count == 3  # nosec B101
 
         for i, endpoint in enumerate(self.endpoints):
             args, kwargs = mock_urlopen.call_args_list[i]
             url = f"{self.test_base_url}{endpoint}.csv"
-            assert args[0].full_url == url
+            assert args[0].full_url == url  # nosec B101
 
     @patch("mactools.update_ieee.urlopen")
     def test_update_failures(self, mock_retrieve: Mock):
         mock_retrieve.side_effect = Exception("Mock Exception")
         test_result = update_ieee_files()
-        assert test_result is False
+        assert test_result is False  # nosec B101
 
     @patch("mactools.update_ieee.path")
     def test_skip_updating_file(self, mock_path: Mock):
         mock_path.return_value = True
         test_result = update_ieee_files(overwrite=False)
-        assert test_result is True
+        assert test_result is True  # nosec B101
 
 
 if __name__ == "__main__":

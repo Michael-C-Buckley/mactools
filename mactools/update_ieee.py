@@ -10,15 +10,15 @@ from urllib.request import Request, urlopen
 from mactools.version import __version__
 
 
-async def get_csv_file(endpoint: str, dest_path: str, overwrite: bool) -> None:
+async def get_csv_file(endpoint: str, dest_path: str, overwrite: bool) -> bool:
     """
     Coroutine for fetching individual CSV file from IEEE
     """
-    filename = f'{path.join(dest_path, endpoint.split("/")[1])}.csv'
+    filename = f"{path.join(dest_path, endpoint.split('/')[1])}.csv"
     if path.exists(filename) and not overwrite:
         return True
     url = f"https://standards-oui.ieee.org/{endpoint}.csv"
-    filename = f'{path.join(dest_path, endpoint.split("/")[1])}.csv'
+    filename = f"{path.join(dest_path, endpoint.split('/')[1])}.csv"
 
     headers = {
         "User-Agent": f"MacTools/{__version__} (https://github.com/Michael-C-Buckley/mactools)"
@@ -30,7 +30,7 @@ async def get_csv_file(endpoint: str, dest_path: str, overwrite: bool) -> None:
                 with open(filename, "wb") as file:
                     file.write(response.read())
                 return True
-    except Exception as e:
+    except Exception as e:  # nosec B110
         pass
 
     return False
