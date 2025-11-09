@@ -6,17 +6,26 @@ from typing import Optional
 from unittest import TestCase, main
 from unittest.mock import MagicMock, Mock, patch
 
-from mactools import (MacAddress, MacNotation, create_random_hex_string,
-                      create_random_mac)
-from mactools.tools_common import (EUI48_REGEX, EUI64_REGEX, HEX_PATTERN,
-                                   MAC_PORTION)
+from mactools import (
+    MacAddress,
+    MacNotation,
+    create_random_hex_string,
+    create_random_mac,
+)
+from mactools.tools_common import EUI48_REGEX, EUI64_REGEX, HEX_PATTERN, MAC_PORTION
+
 # Local Modules
-from tests.test_common import (SAMPLE_EUI48, SAMPLE_EUI64, TEST_CACHE,
-                               TEST_RECORD, TestMac, generate_random_str)
+from tests.test_common import (
+    SAMPLE_EUI48,
+    SAMPLE_EUI64,
+    TEST_CACHE,
+    TEST_RECORD,
+    TestMac,
+    generate_random_str,
+)
 
 
 class TestFunctions(TestCase):
-
     @classmethod
     def setUpClass(cls) -> None:
         cls.mac48 = MacAddress(SAMPLE_EUI48.mac)
@@ -46,7 +55,6 @@ class TestFunctions(TestCase):
 
     @patch("mactools.oui_cache.oui_classes.create_oui_dict")
     def test_mac_validation(self, mocked_create: Mock):
-
         # The exact values of the support functions are not relevant
         mocked_create.return_value = TEST_CACHE.oui_dict
         mock_response = MagicMock()
@@ -80,14 +88,14 @@ class TestFunctions(TestCase):
         Tests passing `OUICache` instance on creation and auto-fetching record
         """
         local_test_mac = MacAddress(SAMPLE_EUI48.mac, cache=TEST_CACHE)
-        self.assertEqual(local_test_mac.vendor, TEST_RECORD.get("vendor"))
+        assert local_test_mac.vendor == TEST_RECORD.get("vendor")
 
     def test_mac_get_vendor(self):
         """
         Tests
         """
         local_test_mac = MacAddress(SAMPLE_EUI48.mac, cache=TEST_CACHE)
-        self.assertEqual(local_test_mac.vendor, TEST_CACHE.get_vendor(SAMPLE_EUI48.mac))
+        assert local_test_mac.vendor == TEST_CACHE.get_vendor(SAMPLE_EUI48.mac)
 
     """
     Test the various MAC Properties
@@ -114,7 +122,7 @@ class TestFunctions(TestCase):
                 start, stop = slicing
                 match_detail = match_detail[start:stop]
 
-            self.assertEqual(mac_detail, match_detail)
+            assert mac_detail == match_detail
 
     def test_mac_oui(self):
         self.mac_test_iterator("oui", "mac", slicing=(0, 8))
@@ -129,8 +137,8 @@ class TestFunctions(TestCase):
         self.mac_test_iterator("colon", "mac")
 
     def test_mac_period(self):
-        self.assertEqual(self.mac48.period, "246D.5EBB.99CC")
-        self.assertEqual(self.mac64.period, "246D.5E00.00BB.99DD")
+        assert self.mac48.period == "246D.5EBB.99CC"
+        assert self.mac64.period == "246D.5E00.00BB.99DD"
 
     def test_mac_hyphen(self):
         self.mac_test_iterator("hyphen", "mac", (":", "-"))
@@ -145,10 +153,10 @@ class TestFunctions(TestCase):
         self.mac_test_iterator("binary", "binary")
 
     def test_get_eui64_suffix(self):
-        self.assertEqual(self.mac48.eui64_suffix, "266d:5eff:febb:99cc")
+        assert self.mac48.eui64_suffix == "266d:5eff:febb:99cc"
 
     def test_get_link_local(self):
-        self.assertEqual(self.mac48.link_local_address, "fe80::266d:5eff:febb:99cc")
+        assert self.mac48.link_local_address == "fe80::266d:5eff:febb:99cc"
 
     """
     Test Magic Methods
@@ -156,35 +164,35 @@ class TestFunctions(TestCase):
 
     def test_magic_str(self):
         for mac, test_mac in self.mac_lookup.items():
-            self.assertEqual(str(mac), test_mac.mac)
+            assert str(mac) == test_mac.mac
 
     def test_magic_hash(self):
         for mac, test_mac in self.mac_lookup.items():
-            self.assertEqual(mac.__hash__(), hash(test_mac.mac.replace(":", "")))
+            assert mac.__hash__() == hash(test_mac.mac.replace(":", ""))
 
     def test_magic_equal(self):
         for mac, test_mac in self.mac_lookup.items():
-            self.assertEqual(mac, MacAddress(test_mac.mac))
-            self.assertFalse("this should be false" == mac)
+            assert mac == MacAddress(test_mac.mac)
+            assert not ("this should be false" == mac)
 
     def test_magic_add(self):
-        self.assertEqual(self.mac48 + 1, "24:6D:5E:BB:99:CD")
-        self.assertEqual(self.mac64 + 1, "24:6D:5E:00:00:BB:99:DE")
+        assert self.mac48 + 1 == "24:6D:5E:BB:99:CD"
+        assert self.mac64 + 1 == "24:6D:5E:00:00:BB:99:DE"
 
     def test_magic_subtract(self):
         # Testing MAC-and-MAC subtraction
         for mac in self.mac_lookup:
-            self.assertEqual(mac - mac, 0)
+            assert mac - mac == 0
         # Testing MAC-and-number subtraction
-        self.assertEqual(self.mac48 - 1, "24:6D:5E:BB:99:CB")
-        self.assertEqual(self.mac64 - 1, "24:6D:5E:00:00:BB:99:DC")
+        assert self.mac48 - 1 == "24:6D:5E:BB:99:CB"
+        assert self.mac64 - 1 == "24:6D:5E:00:00:BB:99:DC"
 
     def test_fuzz_mac(self):
         for i in range(100000):
             test_str = generate_random_str()
             try:
                 test_mac = MacAddress(test_str)
-                self.assertNotEqual(test_mac.validate_mac(test_str), 0)
+                assert test_mac.validate_mac(test_str) != 0
             except ValueError:
                 pass
 

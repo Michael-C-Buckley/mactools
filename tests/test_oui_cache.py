@@ -9,11 +9,16 @@ if TYPE_CHECKING:
     from unittest.mock import _patch_default_new
 
 # Local modules
-from mactools.oui_cache.oui_core import (get_oui_cache, get_oui_record,
-                                         get_oui_vendor)
-from tests.test_common import (OUI_COMMON_PATH, TEST_OUI_DICT, TEST_OUI_STRING,
-                               TEST_VENDOR, URL_MOCK, OUICache,
-                               generate_random_str)
+from mactools.oui_cache.oui_core import get_oui_cache, get_oui_record, get_oui_vendor
+from tests.test_common import (
+    OUI_COMMON_PATH,
+    TEST_OUI_DICT,
+    TEST_OUI_STRING,
+    TEST_VENDOR,
+    URL_MOCK,
+    OUICache,
+    generate_random_str,
+)
 
 
 class TestOUICache(TestCase):
@@ -42,13 +47,13 @@ class TestOUICache(TestCase):
         local_cache = get_oui_cache()
         self.assertIsInstance(local_cache, OUICache)
         for test_case in TEST_OUI_STRING:
-            self.assertEqual(
-                local_cache.get_vendor(TEST_OUI_STRING[test_case]),
-                TEST_VENDOR[test_case],
+            assert (
+                local_cache.get_vendor(TEST_OUI_STRING[test_case])
+                == TEST_VENDOR[test_case]
             )
 
         second_cache = get_oui_cache()
-        self.assertEqual(local_cache, second_cache)
+        assert local_cache is second_cache
 
     @patch(f"os.path.exists")
     @patch.multiple(
@@ -71,14 +76,13 @@ class TestOUICache(TestCase):
         """
         for test_case in TEST_VENDOR:
             test_get = get_oui_vendor(TEST_OUI_STRING[test_case])
-            self.assertEqual(test_get, TEST_VENDOR[test_case])
+            assert test_get == TEST_VENDOR[test_case]
 
     def test_get_record(self):
         """
         Standard testing of fetching a record
         """
         for test_case in TEST_VENDOR:
-
             expected = {
                 "oui": TEST_OUI_STRING[test_case],
                 "vendor": TEST_VENDOR[test_case],
@@ -87,26 +91,26 @@ class TestOUICache(TestCase):
             }
 
             test_get = get_oui_record(TEST_OUI_STRING[test_case])
-            self.assertEqual(test_get, expected)
+            assert test_get == expected
 
     def test_locally_administered(self):
         test_result = get_oui_vendor("4EAAAA")
-        self.assertEqual(test_result, "Locally administered")
+        assert test_result == "Locally administered"
 
     def test_fixed_specific(self):
         test_result = get_oui_vendor("FF:FF:FF:FF:FF:FF")
-        self.assertEqual(test_result, "Broadcast")
+        assert test_result == "Broadcast"
 
     def test_mac_range(self):
         test_result = get_oui_vendor("33:33:0A")
-        self.assertEqual(test_result, "IPv6 Multicast")
+        assert test_result == "IPv6 Multicast"
 
     def test_invalid_get_oui_item(self):
         """
         Tests for the inner functionality of cache getting
         """
         with self.assertRaises(ValueError):
-            get_oui_vendor(10)
+            get_oui_vendor(10)  # type: ignore
 
     def test_invalid_oui_cases(self):
         """
@@ -122,7 +126,7 @@ class TestOUICache(TestCase):
         for test_case, result_note in test_cases.items():
             result = local_cache.get_record(test_case)
             expected = {"input": test_case, "error": True, "note": result_note}
-            self.assertEqual(result, expected)
+            assert result == expected
 
     def test_fuzz_oui_cache(self):
         with patch("mactools.oui_cache.oui_classes.create_oui_dict") as patched_update:

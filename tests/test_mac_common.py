@@ -3,23 +3,34 @@
 # Python Modules
 from unittest import TestCase, main
 
-from mactools import (create_random_hex_bit, create_random_hex_string,
-                      create_random_mac, fill_hex, hex_range, prepare_oui)
+from mactools import (
+    create_random_hex_bit,
+    create_random_hex_string,
+    create_random_mac,
+    fill_hex,
+    hex_range,
+    prepare_oui,
+)
+
 # Local Modules
 from mactools.tools_common import MAC_PATTERN
-from tests.test_common import (MAC48, MAC64, SAMPLE_EUI48, SAMPLE_EUI64,
-                               test_regex_comparison)
+from tests.test_common import (
+    MAC48,
+    MAC64,
+    SAMPLE_EUI48,
+    SAMPLE_EUI64,
+    test_regex_comparison,
+)
 
 
 class TestMACCommon(TestCase):
-
     def test_fill_hex(self):
         """
         Tests for the various cases of `fill_hex`
         """
         test_case_dict = {111: "006F", "ac": "00AC"}
         for test_input, result in test_case_dict.items():
-            self.assertEqual(fill_hex(test_input, 4), result)
+            assert fill_hex(test_input, 4) == result
 
     def test_hex_range(self):
         """
@@ -34,7 +45,7 @@ class TestMACCommon(TestCase):
             expected_result_list.append(test_result)
 
         for i, test_mac in enumerate(hex_range(2)):
-            self.assertEqual(expected_result_list[i], test_mac)
+            assert test_mac == expected_result_list[i]
 
     def test_prepare_oui(self):
         """
@@ -45,11 +56,11 @@ class TestMACCommon(TestCase):
 
         for test_case_48 in [MAC48, SAMPLE_EUI48.mac]:
             result = prepare_oui(test_case_48, False)
-            self.assertEqual(result, test_oui)
+            assert result == test_oui
 
         for test_case_64 in [MAC64, SAMPLE_EUI64.mac]:
             result = prepare_oui(test_case_64, False)
-            self.assertEqual(result, test_oui)
+            assert result == test_oui
 
     def test_create_random_hex_bit(self):
         """
