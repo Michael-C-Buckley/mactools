@@ -1,32 +1,36 @@
-{self, ...}: {
-  perSystem = {pkgs, ...}: let
-    pyproject = builtins.fromTOML (builtins.readFile "${self}/pyproject.toml");
-    inherit (pyproject.project) name version description;
-  in {
-    packages.default = pkgs.python3Packages.buildPythonPackage {
-      pname = name;
-      version = version;
-      src = self;
+{
+  self,
+  pkgs,
+  system,
+  ...
+}: let
+  pyproject = fromTOML (builtins.readFile "${self}/pyproject.toml");
+  inherit (pyproject.project) name version description;
+in {
+  default = pkgs.python3Packages.buildPythonPackage {
+    pname = name;
+    version = version;
+    src = self;
 
-      format = "pyproject";
+    format = "pyproject";
 
-      nativeBuildInputs = with pkgs.python3Packages; [
-        setuptools
-      ];
+    nativeBuildInputs = with pkgs.python3Packages; [
+      setuptools
+    ];
 
-      doCheck = true;
+    doCheck = true;
 
-      checkPhase = ''
-        python -m unittest discover tests/ -v
-      '';
+    checkPhase = ''
+      python -m unittest discover tests/ -v
+    '';
 
-      pythonImportsCheck = ["mactools"];
+    pythonImportsCheck = ["mactools"];
 
-      meta = with pkgs.lib; {
-        description = description;
-        license = licenses.mit;
-        maintainers = [];
-      };
+    meta = with pkgs.lib; {
+      description = description;
+      license = licenses.mit;
+      maintainers = [];
     };
   };
+  mactools = self.packages.${system}.default;
 }
