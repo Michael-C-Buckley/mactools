@@ -14,8 +14,8 @@ from unittest.mock import Mock, patch
 patch("mactools.oui_cache.oui_classes.sleep", return_value=None).start()
 
 # Local Modules
-from mactools import MacAddress
-from mactools.oui_cache.oui_classes import OUICache, OUIType
+from mactools import MacAddress  # noqa: E402
+from mactools.oui_cache.oui_classes import OUICache, OUIType  # noqa: E402
 
 # Fake MACs for internal testing
 TEST_OUI_STRING = {
@@ -121,6 +121,6 @@ def generate_random_str(length: int = 0) -> str:
     """
     Generate a random string of characters, digits, and punctuation for fuzzing
     """
-    length = randint(0, 50) if length == 0 else length
+    length = randint(0, 50) if length == 0 else length  # nosec B311
     chars = ascii_letters + digits + punctuation
-    return "".join(choice(chars) for _ in range(length))
+    return "".join(choice(chars) for _ in range(length))  # nosec B311
