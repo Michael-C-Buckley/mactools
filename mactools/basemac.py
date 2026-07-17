@@ -33,18 +33,19 @@ class BaseMac:
         self,
         mac: Union[str, int],
         format: MacNotation = MacNotation.COLON,
-        oui_cache: "OUICache" = None,
-        *args,
-        **kwargs,
+        oui_cache: "OUICache" | None = None,
     ):
 
         eui = self.validate_mac(mac)
         if not eui:
             raise ValueError(f"{mac} is not a valid MAC Address")
 
-        self.__mac = mac
-        self.__eui = eui
-        self.__oui_record: Dict[str, str] = None
+        if isinstance(mac, int):
+            mac = self.number_to_hex_mac(mac)
+
+        self.__mac: str = mac
+        self.__eui: int = eui
+        self.__oui_record: Dict[str, str] | None = None
         self.format = format
 
         if oui_cache:
@@ -203,7 +204,7 @@ class BaseMac:
     # CONVERSION METHODS
 
     @classmethod
-    def clean_mac_address(cls, input_mac: str, *args, **kwargs):
+    def clean_mac_address(cls, input_mac: str):
         """
         Removes delimiters from a MAC Address
         """
@@ -221,9 +222,7 @@ class BaseMac:
         mac_address: str,
         delimiter: MacNotation = MacNotation.COLON,
         case: str = "upper",
-        interval: int = None,
-        *args,
-        **kwargs,
+        interval: int | None = None,
     ) -> str:
         """
         Takes a MAC address and re-formats it appropriately
@@ -251,7 +250,7 @@ class BaseMac:
         return case_result()
 
     @classmethod
-    def hex_to_number(cls, input_mac: str, *args, **kwargs) -> int:
+    def hex_to_number(cls, input_mac: str) -> int:
         """
         Returns a numerical representation of a MAC Address from hex
         """
@@ -263,8 +262,6 @@ class BaseMac:
         input_number: int,
         form: MacNotation = MacNotation.COLON,
         bit_length: int = 48,
-        *args,
-        **kwargs,
     ) -> str:
         """
         Returns a hexadecimal representation for a MAC Address from a number
@@ -289,5 +286,5 @@ class BaseMac:
         ip_address = f"{global_prefix}:{self.eui64_suffix}"
         try:
             return IPv6(ip_address)
-        except AddressValueError as e:
+        except AddressValueError:
             raise ValueError(f"Invalid IPv6 address: {ip_address}")
