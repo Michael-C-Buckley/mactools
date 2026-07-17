@@ -10,10 +10,16 @@ from urllib.request import urlopen
 
 # Local Modules
 from mactools.mac_common import prepare_oui
-from mactools.oui_cache.oui_common import (UPDATE_IEEE, VERSION, OUIType,
-                                           create_oui_dict, fixed_ouis,
-                                           mac_ranges, specific_macs)
+from mactools.oui_cache.oui_common import (
+    UPDATE_IEEE,
+    OUIType,
+    create_oui_dict,
+    fixed_ouis,
+    mac_ranges,
+    specific_macs,
+)
 from mactools.tools_common import get_hex_value
+from mactools.version import __version__
 
 
 class OUICache:
@@ -38,7 +44,7 @@ class OUICache:
         self, oui_dict: Dict[OUIType, Dict[str, str]], attempt_update: bool = True
     ) -> None:
         self.attempt_update = attempt_update
-        self.version: str = VERSION
+        self.version: str = __version__
         self.timestamp: datetime = datetime.now()
         self.oui_dict: Dict[OUIType, Dict[str, str]] = oui_dict
         self._initialized = True
@@ -112,8 +118,7 @@ class OUICache:
                 return result
 
         # Check to see if the record exists but isn't in the cache, in which trigger an update
-        with urlopen(f"https://api.maclookup.app/v2/macs/{input_mac}") as response:
-
+        with urlopen(f"https://api.maclookup.app/v2/macs/{input_mac}") as response:  # nosec B310
             # Fall-through case for valid OUI without any registration
             no_entry_note = "This OUI is valid but has no associated registration in the IEEE global registry (MA-L, MA-M, or MA-S)"
             no_entry_dict = {
@@ -128,15 +133,14 @@ class OUICache:
             if response.code == 200:
                 result = load(response)
 
-                if result["success"] != True:
-
+                if not result["success"]:
                     return no_entry_dict
 
                 # Update the entire cache due to invalidation
                 if UPDATE_IEEE is True:
                     self.oui_dict = create_oui_dict(update=True)
 
-                if result["found"] != True:
+                if not result["found"]:
                     return no_entry_dict
 
                 api_oui = result["macPrefix"]

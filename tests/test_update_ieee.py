@@ -2,8 +2,6 @@
 
 # Python Modules
 from importlib.resources import files
-from os import path
-from time import sleep
 from unittest import TestCase, main
 from unittest.mock import MagicMock, Mock, mock_open, patch
 

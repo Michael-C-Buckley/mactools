@@ -1,4 +1,4 @@
-# Pytho Modules
+# Python Modules
 from concurrent.futures import ThreadPoolExecutor as Executor
 from csv import reader
 from enum import Enum
@@ -8,8 +8,6 @@ from os import path, remove
 from tempfile import gettempdir
 from typing import TYPE_CHECKING, Dict
 
-# Common Re-used Imports
-from mactools.version import __version__ as VERSION
 # Local Modules
 from mactools.update_ieee import update_ieee_files
 
@@ -62,14 +60,15 @@ mac_ranges: dict[str, str] = {
 
 def handle_paths():
     """
-    Check to see which paths are writeable for the IEEE CSV files.
+    Check to see which paths are writable for the IEEE CSV files.
     First preference is the library's folder
     Fallback is the temporary files of the computer
     """
+
     # Constructs to create and track the file paths and statuses
-    create_file_paths = lambda x: [
-        path.join(x, f"{i}.csv") for i in ["oui36", "mam", "oui"]
-    ]
+    def create_file_paths(x):
+        return [path.join(x, f"{i}.csv") for i in ["oui36", "mam", "oui"]]
+
     base_ieee_path = files("mactools").joinpath("resources/ieee")
     temp_ieee_path = path.join(gettempdir(), "python3-mactools")
 
@@ -83,7 +82,7 @@ def handle_paths():
 
     local_list = [(library_path_list, "library"), (temp_path_list, "temp")]
 
-    # Check to see those constructed pathes
+    # Check to see those constructed paths
     for ieee_path, which_path in local_list:
         for file_path in ieee_path:
             if not path.exists(file_path):
@@ -98,14 +97,14 @@ def handle_paths():
     if path_status["temp"]:
         return temp_path_list
 
-    # No hits prompts a writeable check
+    # No hits prompts a writable check
     try:
         test_file = path.join(base_ieee_path, "writetest")
         with open(test_file, "w") as file:
             file.write("This is only a test")
         remove(test_file)
     except IOError:
-        # Library path not writeable, use the temp directory
+        # Library path not writable, use the temp directory
         return temp_path_list
 
     return library_path_list

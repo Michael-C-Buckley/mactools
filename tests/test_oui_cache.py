@@ -9,11 +9,16 @@ if TYPE_CHECKING:
     from unittest.mock import _patch_default_new
 
 # Local modules
-from mactools.oui_cache.oui_core import (get_oui_cache, get_oui_record,
-                                         get_oui_vendor)
-from tests.test_common import (OUI_COMMON_PATH, TEST_OUI_DICT, TEST_OUI_STRING,
-                               TEST_VENDOR, URL_MOCK, OUICache,
-                               generate_random_str)
+from mactools.oui_cache.oui_core import get_oui_cache, get_oui_record, get_oui_vendor
+from tests.test_common import (
+    OUI_COMMON_PATH,
+    TEST_OUI_DICT,
+    TEST_OUI_STRING,
+    TEST_VENDOR,
+    URL_MOCK,
+    OUICache,
+    generate_random_str,
+)
 
 
 class TestOUICache(TestCase):
@@ -50,7 +55,7 @@ class TestOUICache(TestCase):
         second_cache = get_oui_cache()
         self.assertEqual(local_cache, second_cache)
 
-    @patch(f"os.path.exists")
+    @patch("os.path.exists")
     @patch.multiple(
         OUI_COMMON_PATH, update_ieee_files=DEFAULT, process_ieee_csv=DEFAULT
     )
@@ -78,7 +83,6 @@ class TestOUICache(TestCase):
         Standard testing of fetching a record
         """
         for test_case in TEST_VENDOR:
-
             expected = {
                 "oui": TEST_OUI_STRING[test_case],
                 "vendor": TEST_VENDOR[test_case],
@@ -129,7 +133,7 @@ class TestOUICache(TestCase):
             patched_update.return_value = TEST_OUI_DICT
             for i in range(100000):
                 test_str = generate_random_str()
-                test_result = get_oui_record(test_str)
+                get_oui_record(test_str)
 
 
 if __name__ == "__main__":
