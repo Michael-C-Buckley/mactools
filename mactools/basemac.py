@@ -7,13 +7,13 @@ from enum import Enum
 from functools import cached_property
 from ipaddress import AddressValueError
 from ipaddress import IPv6Address as IPv6
-from typing import TYPE_CHECKING, Dict, Optional, Union
+from typing import TYPE_CHECKING, LiteralString, override
 
 # Local Modules
 from mactools.tools_common import get_hex_value
 
 if TYPE_CHECKING:
-    from mactools.oui_cache.oui_core import OUICache
+    from mactools.oui_cache.oui_classes import OUICache
 
 
 class MacNotation(Enum):
@@ -31,10 +31,10 @@ class BaseMac:
 
     def __init__(
         self,
-        mac: Union[str, int],
+        mac: str | int,
         format: MacNotation = MacNotation.COLON,
-        oui_cache: "OUICache" | None = None,
-    ):
+        oui_cache: "OUICache | None" = None,
+    ) -> None:
 
         eui = self.validate_mac(mac)
         if not eui:
@@ -45,13 +45,14 @@ class BaseMac:
 
         self.__mac: str = mac
         self.__eui: int = eui
-        self.__oui_record: Dict[str, str] | None = None
-        self.format = format
+        self.__oui_record: dict[str, str] | None = None
+        self.format: MacNotation = format
 
         if oui_cache:
             self.__oui_record = oui_cache.get_record(self.clean_oui)
 
-    def __str__(self):
+    @override
+    def __str__(self) -> str:
         format_map = {
             MacNotation.CLEAN: self.clean,
             MacNotation.COLON: self.colon,
@@ -59,26 +60,29 @@ class BaseMac:
             MacNotation.HYPHEN: self.hyphen,
             MacNotation.SPACE: self.space,
         }
-        return format_map.get(self.format)
+        return format_map.get(self.format, self.colon)
 
-    def __repr__(self):
+    @override
+    def __repr__(self) -> str:
         return f"EUI{self.__eui}({str(self)})"
 
+    @override
     def __hash__(self) -> int:
         return hash(self.clean)
 
+    @override
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, BaseMac):
             return False
         return self.clean == other.clean
 
-    def __add__(self, value: int):
+    def __add__(self, value: int) -> str:
         """
         Returns the shifted MAC when adding a number
         """
         return self.number_to_hex_mac(self.decimal + value, self.format, self.__eui)
 
-    def __sub__(self, value: Union[int, "BaseMac"]):
+    def __sub__(self, value: int | BaseMac) -> int | str:
         """
         Returns a shifted MAC when `value` is a number or the integer difference
         between two MACs when `value` is another MAC address
@@ -88,7 +92,7 @@ class BaseMac:
         return self.number_to_hex_mac(self.decimal - value, self.format, self.__eui)
 
     @classmethod
-    def validate_mac(cls, mac_input: Union[str, int]) -> int:
+    def validate_mac(cls, mac_input: str | int) -> int:
         """
         Validates a string and returns the EUI value for valid matches or 0 for invalid
         """
@@ -101,7 +105,7 @@ class BaseMac:
     # PROPERTIES
 
     @property
-    def vendor(self) -> Optional[str]:
+    def vendor(self) -> str | None:
         """
         Returns the vendor if the IEEE lookup was made
         """
@@ -136,49 +140,57 @@ class BaseMac:
         """
         Return Binary Form
         """
-        return self.number_to_binary(self.decimal, self.__eui)
+        return self.number_to_binary(input_number=self.decimal, bit_length=self.__eui)
 
     @cached_property
     def decimal(self) -> int:
         """
         Returns the decimal form
         """
-        return self.hex_to_number(self.__mac)
+        return self.hex_to_number(input_mac=self.__mac)
 
     @cached_property
     def clean(self) -> str:
         """
         Returns the clean Form
         """
-        return self.clean_mac_address(self.__mac)
+        return self.clean_mac_address(input_mac=self.__mac)
 
     @cached_property
     def colon(self) -> str:
         """
         Returns the Colon-separated Form
         """
-        return self.format_mac_address(self.__mac, MacNotation.COLON)
+        return self.format_mac_address(
+            mac_address=self.__mac, delimiter=MacNotation.COLON
+        )
 
     @cached_property
     def period(self) -> str:
         """
         Returns the Period-separated Form
         """
-        return self.format_mac_address(self.__mac, MacNotation.PERIOD)
+        return self.format_mac_address(
+            mac_address=self.__mac, delimiter=MacNotation.PERIOD
+        )
 
     @cached_property
     def hyphen(self) -> str:
         """
         Returns the Hyphen-separated Form
         """
-        return self.format_mac_address(self.__mac, MacNotation.HYPHEN)
+        return self.format_mac_address(
+            mac_address=self.__mac, delimiter=MacNotation.HYPHEN
+        )
 
     @cached_property
     def space(self) -> str:
         """
         Returns the Space-separated Form
         """
-        return self.format_mac_address(self.__mac, MacNotation.SPACE)
+        return self.format_mac_address(
+            mac_address=self.__mac, delimiter=MacNotation.SPACE
+        )
 
     @cached_property
     def eui64_suffix(self) -> str:
@@ -186,13 +198,15 @@ class BaseMac:
         Returns the EUI-64 suffix for an IPv6 address
         """
         if self.__eui == 48:
-            eui = str(self.clean)
-            swapped = hex(int(eui[1:2], 16) + 2)[2:]
-            eui = f"{eui[:1]}{swapped}{eui[2:6]}fffe{eui[6:]}"
+            eui: str = str(self.clean)  # pyright: ignore[reportRedeclaration]
+            swapped: str = hex(int(eui[1:2], 16) + 2)[2:]
+            eui: str = f"{eui[:1]}{swapped}{eui[2:6]}fffe{eui[6:]}"
         else:
             # EUI-64 will assume it doesn't need to be flipped
             eui = self.clean
-        return self.format_mac_address(eui, MacNotation.COLON, "lower", interval=4)
+        return self.format_mac_address(
+            mac_address=eui, delimiter=MacNotation.COLON, case="lower", interval=4
+        )
 
     @cached_property
     def link_local_address(self) -> str:
@@ -204,30 +218,32 @@ class BaseMac:
     # CONVERSION METHODS
 
     @classmethod
-    def clean_mac_address(cls, input_mac: str):
+    def clean_mac_address(cls, input_mac: str | int) -> str:
         """
         Removes delimiters from a MAC Address
         """
         if isinstance(input_mac, int):
-            mac = cls.number_to_hex_mac(input_mac, MacNotation.CLEAN)
-        elif isinstance(input_mac, str):
-            mac = input_mac.strip()
+            mac: str = cls.number_to_hex_mac(  # pyright: ignore[reportRedeclaration]
+                input_number=input_mac, form=MacNotation.CLEAN
+            )
+        else:
+            mac: str = input_mac.strip()  # pyright: ignore[reportRedeclaration]
             for char in [":", ".", "-", " "]:
-                mac = mac.replace(char, "").upper()
+                mac: str = mac.replace(char, "").upper()
         return mac
 
     @classmethod
     def format_mac_address(
         cls,
-        mac_address: str,
-        delimiter: MacNotation = MacNotation.COLON,
+        mac_address: str,  # pyright: ignore[reportRedeclaration]
+        delimiter: MacNotation = MacNotation.COLON,  # pyright: ignore[reportRedeclaration]
         case: str = "upper",
         interval: int | None = None,
     ) -> str:
         """
         Takes a MAC address and re-formats it appropriately
         """
-        mac_address = cls.clean_mac_address(mac_address)
+        mac_address: str = cls.clean_mac_address(input_mac=mac_address)
 
         delimiter: str = delimiter.value
 
@@ -236,11 +252,11 @@ class BaseMac:
         else:
             slice_len = interval
 
-        mac_slices = [
+        mac_slices: list[str] = [
             mac_address[i : i + slice_len]
             for i in range(0, len(mac_address), slice_len)
         ]
-        joined_mac = delimiter.join(mac_slices)
+        joined_mac: str = delimiter.join(mac_slices)
 
         case_dict = {"upper": joined_mac.upper, "lower": joined_mac.lower}
 
@@ -266,11 +282,11 @@ class BaseMac:
         """
         Returns a hexadecimal representation for a MAC Address from a number
         """
-        clean_hex = hex(input_number)[2:]
-        fill_required = int(len(clean_hex) - (bit_length / 4))
-        leading_zeros = "".zfill(fill_required)
-        filled_hex = f"{leading_zeros}{clean_hex}"
-        return cls.format_mac_address(filled_hex, form)
+        clean_hex: str = hex(input_number)[2:]
+        fill_required: int = int(len(clean_hex) - (bit_length / 4))
+        leading_zeros: LiteralString = "".zfill(fill_required)
+        filled_hex: str = f"{leading_zeros}{clean_hex}"
+        return cls.format_mac_address(mac_address=filled_hex, delimiter=form)
 
     @classmethod
     def number_to_binary(cls, input_number: int, bit_length: int) -> int:
@@ -285,6 +301,6 @@ class BaseMac:
         """
         ip_address = f"{global_prefix}:{self.eui64_suffix}"
         try:
-            return IPv6(ip_address)
+            return IPv6(address=ip_address)
         except AddressValueError:
             raise ValueError(f"Invalid IPv6 address: {ip_address}")
