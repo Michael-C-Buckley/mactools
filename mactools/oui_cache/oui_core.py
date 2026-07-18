@@ -1,8 +1,6 @@
 # OUI Database
 
 # Python Modules
-from typing import Dict, Optional
-
 # Local Modules
 from mactools.oui_cache.oui_classes import OUICache
 from mactools.oui_cache.oui_common import create_oui_dict
@@ -18,7 +16,7 @@ def get_oui_cache(regenerate: bool = False) -> OUICache:
     return OUICache(create_oui_dict())
 
 
-def get_oui_record(input_mac: str) -> Optional[Dict[str, str]]:
+def get_oui_record(input_mac: str) -> dict[str, str] | None:
     """
     Gets the record of a MAC or OUI
     """

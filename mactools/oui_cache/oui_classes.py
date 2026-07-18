@@ -5,7 +5,6 @@ from datetime import datetime
 from json import load
 from re import search
 from time import sleep
-from typing import Dict
 from urllib.request import urlopen
 
 # Local Modules
@@ -41,15 +40,15 @@ class OUICache:
         cls._instance = new
 
     def __init__(
-        self, oui_dict: Dict[OUIType, Dict[str, str]], attempt_update: bool = True
+        self, oui_dict: dict[OUIType, dict[str, str]], attempt_update: bool = True
     ) -> None:
         self.attempt_update = attempt_update
         self.version: str = __version__
         self.timestamp: datetime = datetime.now()
-        self.oui_dict: Dict[OUIType, Dict[str, str]] = oui_dict
+        self.oui_dict: dict[OUIType, dict[str, str]] = oui_dict
         self._initialized = True
 
-    def get_record(self, input_mac: str) -> Dict[str, str]:
+    def get_record(self, input_mac: str) -> dict[str, str]:
         """
         Returns the assigned OUI and organization associated with a MAC or OUI
         """
@@ -111,7 +110,7 @@ class OUICache:
         key_length_map = {OUIType.OUI36: 9, OUIType.OUI28: 7, OUIType.OUI: 6}
 
         for oui_type, key_len in key_length_map.items():
-            inner_dict: Dict[str, str] = self.oui_dict.get(oui_type)
+            inner_dict: dict[str, str] = self.oui_dict.get(oui_type)
             result = inner_dict.get(oui[:key_len])
             if result:
                 result["error"] = False

@@ -2,21 +2,29 @@
 
 # Python Modules
 from re import Pattern, match
-from typing import Optional
 from unittest import TestCase, main
 from unittest.mock import MagicMock, Mock, patch
 
-from mactools import (MacAddress, MacNotation, create_random_hex_string,
-                      create_random_mac)
-from mactools.tools_common import (EUI48_REGEX, EUI64_REGEX, HEX_PATTERN,
-                                   MAC_PORTION)
+from mactools import (
+    MacAddress,
+    MacNotation,
+    create_random_hex_string,
+    create_random_mac,
+)
+from mactools.tools_common import EUI48_REGEX, EUI64_REGEX, HEX_PATTERN, MAC_PORTION
+
 # Local Modules
-from tests.test_common import (SAMPLE_EUI48, SAMPLE_EUI64, TEST_CACHE,
-                               TEST_RECORD, TestMac, generate_random_str)
+from tests.test_common import (
+    SAMPLE_EUI48,
+    SAMPLE_EUI64,
+    TEST_CACHE,
+    TEST_RECORD,
+    TestMac,
+    generate_random_str,
+)
 
 
 class TestFunctions(TestCase):
-
     @classmethod
     def setUpClass(cls) -> None:
         cls.mac48 = MacAddress(SAMPLE_EUI48.mac)
@@ -97,8 +105,8 @@ class TestFunctions(TestCase):
         self,
         mac_attr: str,
         tested_attr: str,
-        replacements: Optional[tuple[str]] = None,
-        slicing: Optional[tuple[int]] = None,
+        replacements: tuple[str, ...] | None = None,
+        slicing: tuple[int, ...] | None = None,
     ):
         """
         De-duplication function for testing MAC forms for 48 and 64-bit versions

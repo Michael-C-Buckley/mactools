@@ -2,19 +2,17 @@
 
 # Python Modules
 from random import randint
-from typing import Iterator, Union
+from collections.abc import Callable, Iterator
 
 # Local Modules
 from mactools.basemac import BaseMac, MacNotation
 
 
-def fill_hex(
-    raw_input: Union[str, int], required_length: int, backfill: bool = False
-) -> str:
+def fill_hex(raw_input: str | int, required_length: int, backfill: bool = False) -> str:
     """
     Returns a hex string of `length` padded with leading zeros
     """
-    case_dict: dict[type, callable] = {
+    case_dict: dict[type[int] | type[str], Callable[[int | str], str]] = {
         int: lambda arg: hex(arg)[2:].upper(),
         str: lambda arg: str(arg).strip().upper(),
     }
@@ -44,7 +42,7 @@ def hex_range(
         yield f"{fixed_start}{fill_part}{fixed_end}"
 
 
-def prepare_oui(input_mac: Union[BaseMac, str, int], full: bool = True) -> str:
+def prepare_oui(input_mac: BaseMac | str | int, full: bool = True) -> str:
     """
     Takes a MAC or OUI and strips and prepares a unified clean OUI
     """
@@ -65,7 +63,7 @@ def create_random_hex_bit() -> str:
     """
     Returns a single bit between 0-9 or A-F
     """
-    return hex(randint(0, 15))[2:3].upper()
+    return hex(randint(0, 15))[2:3].upper()  # nosec B311
 
 
 def create_random_hex_string(length: int = 2) -> str:

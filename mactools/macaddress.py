@@ -1,8 +1,6 @@
 # MacTools MAC Address Class
 
 # Python Modules
-from typing import Union
-
 # Local Modules
 from mactools.basemac import BaseMac, MacNotation
 
@@ -15,7 +13,7 @@ class MacAddress(BaseMac):
 
     def __init__(
         self,
-        mac: Union[str, int],
+        mac: str | int,
         format: MacNotation = MacNotation.COLON,
         *args,
         **kwargs,

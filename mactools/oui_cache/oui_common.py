@@ -6,13 +6,9 @@ from importlib.resources import files
 from io import StringIO
 from os import path, remove
 from tempfile import gettempdir
-from typing import TYPE_CHECKING, Dict
 
 # Local Modules
 from mactools.update_ieee import update_ieee_files
-
-if TYPE_CHECKING:
-    from mactools.oui_cache.oui_classes import OUIType
 
 BASE_IEEE_PATH = files("mactools").joinpath("resources/ieee")
 IEEE_FILE_PATHS = [
@@ -110,7 +106,7 @@ def handle_paths():
     return library_path_list
 
 
-def process_ieee_csv(file_path: str) -> Dict[OUIType, Dict[str, str]]:
+def process_ieee_csv(file_path: str) -> dict[OUIType, dict[str, str]]:
     """
     Converts the IEEE CSV response into a Python dictionary
     """
@@ -138,7 +134,7 @@ def process_ieee_csv(file_path: str) -> Dict[OUIType, Dict[str, str]]:
     return {OUIType(assignment_type): entries}
 
 
-def create_oui_dict(update: bool = False) -> Dict["OUIType", Dict[str, str]]:
+def create_oui_dict(update: bool = False) -> dict[OUIType, dict[str, str]]:
     """
     Creates the dictionary used in the cache object from the IEEE CSV files
     """
