@@ -19,6 +19,7 @@ pkgs.mkShell {
     ruff
     gcc
     pkg-config
+    basedpyright
 
     # Pre-commit
     lefthook

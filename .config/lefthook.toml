@@ -18,5 +18,11 @@ glob = "*.py"
 run = "bandit -r {staged_files} -c pyproject.toml"
 
 [pre-commit.commands.unittest]
-glob = "^(mactools/|tests/)"
+glob = "*.py"
 run = "python -m unittest discover tests/ -q"
+
+# TODO: Currently needs resolving lots of incidental issues before
+# making standard practice
+#[pre-commit.commands.basedpyright]
+#glob = "*.{py,toml}"
+#run = "basedpyright"

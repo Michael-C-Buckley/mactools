@@ -35,6 +35,11 @@ Issues = "https://github.com/Michael-C-Buckley/mactools/issues"
 [tool.setuptools]
 packages = ["mactools", "mactools.oui_cache"]
 
+[tool.basedpyright]
+include = ["mactools", "tests"]
+pythonVersion = "3.14"
+typeCheckingMode = "recommended"
+
 [tool.setuptools.package-data]
 mactools = ["resources/ieee/*.csv"]
 
